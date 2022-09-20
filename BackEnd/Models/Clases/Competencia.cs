@@ -20,5 +20,11 @@
 
         public int idPenca { get; set; }
 
+        public Competencia()
+        {
+            posiciones = new List<Nombre>();
+            participantes = new List<Participante>();
+        }
+
     }
 }

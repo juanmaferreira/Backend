@@ -59,6 +59,8 @@ namespace BackEnd.Models.Clases
 
         public Tipo_Liga tipo_Liga { get; set; }
 
+        public string color { get; set; }
+
 
         //Constructores
         public Penca() {

@@ -28,6 +28,7 @@ namespace BackEnd.Models.Clases
             puntos_por_penca = new List<Puntuacion>();
             predicciones = new List<Prediccion>();
             chats = new List<Chat>();
+            apuestas = new List<Apuesta>();
         }
        
     }
