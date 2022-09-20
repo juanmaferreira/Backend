@@ -18,7 +18,7 @@ namespace BackEnd.Models.Clases{
 
 		public Tipo_Resultado resultado { get; set; }
 
-		public Equipo[] visitante_local = new Equipo[1];
+		public Equipo[] visitante_local = new Equipo[2];
 
         public int idPenca { get; set; }
 

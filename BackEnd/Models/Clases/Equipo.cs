@@ -15,7 +15,7 @@ namespace BackEnd.Models.Clases{
 
         public string nombreEquipo { get; set; }
 
-        public Historial[] historiales = new Historial[4];
+        public Historial[] historiales = new Historial[5];
 
     }
 }
