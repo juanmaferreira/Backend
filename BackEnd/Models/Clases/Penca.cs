@@ -54,6 +54,7 @@ namespace BackEnd.Models.Clases
 
         //Relaciones
         public Liga_Equipo liga_Equipo { get; set; }
+        public Liga_Individual liga_Individual { get; set; }
 
         public List<Puntuacion> participantes_puntos { get; set; } // Aca guarda todas las puntuaciones de cada participante para luego ranquearlo y entregar el premio
 
@@ -66,6 +67,8 @@ namespace BackEnd.Models.Clases
         public Penca() {
             foro = new List<Mensaje>();
             participantes_puntos = new List<Puntuacion>();
+            liga_Equipo = new Liga_Equipo();
+            liga_Individual = new Liga_Individual();
         }
     }
 }
