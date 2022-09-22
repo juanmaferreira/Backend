@@ -25,6 +25,14 @@ namespace BackEnd.Models.Clases{
 
 		public Partido() { }
 
+
+        public void asignarEquipos(Equipo l, Equipo v)
+        {
+            visitante_local = new Equipo[2];
+            visitante_local[0] = v;
+            visitante_local[1] = l;
+        }
+
 	}
 
 }

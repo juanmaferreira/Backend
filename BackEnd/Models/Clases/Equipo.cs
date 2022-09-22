@@ -1,13 +1,10 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.InteropServices;
 
 namespace BackEnd.Models.Clases{
 
-    public enum Historial { 
-        Gano,
-        Perdio,
-        Empato
-    }
+    
 
     public class Equipo{
 
@@ -15,7 +12,7 @@ namespace BackEnd.Models.Clases{
 
         public string nombreEquipo { get; set; }
 
-        public Historial[] historiales = new Historial[5];
-
+        [NotMapped]
+        public Tipo_Historial[] historiales = new Tipo_Historial[5];
     }
 }
