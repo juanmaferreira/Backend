@@ -57,7 +57,7 @@ namespace BackEnd.Controllers
             {
                 team.historiales = new List<Historial>();
             }
-            team.historiales.Insert(0, historial);
+            team.historiales.Add(historial);
 
             _context.Entry(team).State = EntityState.Modified;
             await _context.SaveChangesAsync();
@@ -65,14 +65,36 @@ namespace BackEnd.Controllers
             return NoContent();
         }
 
-        [HttpGet("/HistorialEquipo/id")]
+        [HttpGet("/mostrarHistorial/{id}")]
         [ProducesResponseType(typeof(Equipo), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetEquipoById(int id)
         {
             var equipo = _context.Equipos.Include(e => e.historiales);
-       
-            return Ok(equipo);
+            Equipo equipo2 = new Equipo();
+            foreach(var aux in equipo)
+            {
+                if(aux.id == id)
+                {
+                    equipo2 = aux;
+                    break;
+                }
+            }
+
+            List<Historial> historial = new List<Historial>();
+            List<Historial> auxList = equipo2.historiales;
+            auxList.Reverse();
+            int count = 0;
+            foreach (var auxH in auxList) { 
+                historial.Add(auxH);
+                count++;
+                if(count == 5)
+                {
+                    break;
+                }
+            }
+
+            return Ok(historial);
         }
     }
 
