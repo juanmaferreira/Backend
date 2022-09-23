@@ -20,7 +20,7 @@
 
         public List<Apuesta> apuestas { get; set; }
 
-        public bool disponible { get; set; }
+        public int topeParticipantes { get; set; }
 
         public Competencia()
         {

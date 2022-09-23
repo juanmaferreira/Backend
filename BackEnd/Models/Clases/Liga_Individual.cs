@@ -6,7 +6,7 @@
         public string Nombre { get; set; }
         
         public List<Competencia> competencias { get; set; }
-        public bool disponible { get; set; }
+        public int topeCompetencias { get; set; }
 
         public Liga_Individual()
         {
