@@ -20,6 +20,8 @@
 
         public List<Apuesta> apuestas { get; set; }
 
+        public bool disponible { get; set; }
+
         public Competencia()
         {
             posiciones = new List<Nombre>();
