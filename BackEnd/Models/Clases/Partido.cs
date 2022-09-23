@@ -18,21 +18,9 @@ namespace BackEnd.Models.Clases{
 
 		public Tipo_Resultado resultado { get; set; }
 
-		public Equipo[] visitante_local = new Equipo[2];
-
-        public int idPenca { get; set; }
-
-
-		public Partido() { }
-
-
-        public void asignarEquipos(Equipo l, Equipo v)
-        {
-            visitante_local = new Equipo[2];
-            visitante_local[0] = v;
-            visitante_local[1] = l;
-        }
-
+		public List <Equipo> visitante_local { get; set; }
+        
+        public List<Prediccion> predicciones { get; set; }
 	}
 
 }

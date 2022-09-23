@@ -12,7 +12,6 @@ namespace BackEnd.Models.Clases{
 
         public string nombreEquipo { get; set; }
 
-        [NotMapped]
-        public Tipo_Historial[] historiales = new Tipo_Historial[5];
+        public List<Historial> historiales { get; set; }
     }
 }

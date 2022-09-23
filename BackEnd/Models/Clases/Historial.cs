@@ -8,9 +8,10 @@ namespace BackEnd.Models.Clases
         Perdio,
         Empato
     }
+  
     public class Historial
     {
-        public int Id { get; set; }
+        public int Id { get; set; } 
         public Tipo_Historial tipo_Historial { get; set; }
     }
 }

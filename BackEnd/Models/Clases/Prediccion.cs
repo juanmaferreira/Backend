@@ -8,5 +8,7 @@
         public Partido partido { get; set; }
 
         public Usuario usuario { get; set; }
+
+         public int idPuntuacionUsuario { get; set; }
     }
 }

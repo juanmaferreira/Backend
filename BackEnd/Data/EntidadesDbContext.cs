@@ -26,8 +26,8 @@ namespace BackEnd.Data
         public DbSet<Prediccion> Predicciones { get; set; }
         public DbSet<Puntuacion> Puntuaciones { get; set; }
         public DbSet<Usuario> Usuario { get; set; }
-
-
-
+        public DbSet<Historial> Historials { get; set; }
+        public DbSet<Administrador> Administradores { get; set; }
+        public DbSet<SuperAdmin> SuperAdmins { get; set; }
     }
 }

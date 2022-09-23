@@ -51,18 +51,28 @@ namespace BackEnd.Controllers
             var team = await _context.Equipos.FindAsync(id);
             if (team == null) return BadRequest();
 
-            for(var i = 4; 0 < i; i--)
+            Historial historial = new Historial();
+            historial.tipo_Historial = tipo;
+            if (team.historiales == null)
             {
-                team.historiales[i] = team.historiales[i-1];
+                team.historiales = new List<Historial>();
             }
-            team.historiales[0] = tipo;
+            team.historiales.Insert(0, historial);
 
-
-           
             _context.Entry(team).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [HttpGet("/HistorialEquipo/id")]
+        [ProducesResponseType(typeof(Equipo), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetEquipoById(int id)
+        {
+            var equipo = _context.Equipos.Include(e => e.historiales);
+       
+            return Ok(equipo);
         }
     }
 

@@ -10,6 +10,23 @@ namespace BackEnd.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Administradores",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    billetera = table.Column<float>(type: "real", nullable: false),
+                    Tipo_Rol = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Administradores", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Empresas",
                 columns: table => new
                 {
@@ -18,7 +35,8 @@ namespace BackEnd.Data.Migrations
                     email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     pass = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    billetera = table.Column<float>(type: "real", nullable: false)
+                    billetera = table.Column<float>(type: "real", nullable: false),
+                    tipoRol = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -52,6 +70,23 @@ namespace BackEnd.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SuperAdmins",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    economia = table.Column<float>(type: "real", nullable: false),
+                    Tipo_Rol = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SuperAdmins", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Usuario",
                 columns: table => new
                 {
@@ -69,25 +104,6 @@ namespace BackEnd.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Equipos",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    nombreEquipo = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Liga_Equipoid = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Equipos", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_Equipos_Liga_Equipos_Liga_Equipoid",
-                        column: x => x.Liga_Equipoid,
-                        principalTable: "Liga_Equipos",
-                        principalColumn: "id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Partidos",
                 columns: table => new
                 {
@@ -95,7 +111,6 @@ namespace BackEnd.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     fechaPartido = table.Column<DateTime>(type: "datetime2", nullable: false),
                     resultado = table.Column<int>(type: "int", nullable: false),
-                    idPenca = table.Column<int>(type: "int", nullable: false),
                     Liga_Equipoid = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -106,6 +121,27 @@ namespace BackEnd.Data.Migrations
                         column: x => x.Liga_Equipoid,
                         principalTable: "Liga_Equipos",
                         principalColumn: "id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Competencias",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Area = table.Column<int>(type: "int", nullable: false),
+                    fecha_competencia = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Liga_IndividualId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Competencias", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Competencias_Liga_Individuales_Liga_IndividualId",
+                        column: x => x.Liga_IndividualId,
+                        principalTable: "Liga_Individuales",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -124,12 +160,20 @@ namespace BackEnd.Data.Migrations
                     entrada = table.Column<float>(type: "real", nullable: true),
                     pozo = table.Column<float>(type: "real", nullable: true),
                     liga_Equipoid = table.Column<int>(type: "int", nullable: false),
+                    liga_IndividualId = table.Column<int>(type: "int", nullable: false),
                     tipo_Liga = table.Column<int>(type: "int", nullable: false),
+                    color = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AdministradorId = table.Column<int>(type: "int", nullable: true),
                     Empresaid = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Pencas", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Pencas_Administradores_AdministradorId",
+                        column: x => x.AdministradorId,
+                        principalTable: "Administradores",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Pencas_Empresas_Empresaid",
                         column: x => x.Empresaid,
@@ -141,28 +185,12 @@ namespace BackEnd.Data.Migrations
                         principalTable: "Liga_Equipos",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Competencias",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Area = table.Column<int>(type: "int", nullable: false),
-                    fecha_competencia = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    idPenca = table.Column<int>(type: "int", nullable: false),
-                    Liga_IndividualId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Competencias", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Competencias_Liga_Individuales_Liga_IndividualId",
-                        column: x => x.Liga_IndividualId,
+                        name: "FK_Pencas_Liga_Individuales_liga_IndividualId",
+                        column: x => x.liga_IndividualId,
                         principalTable: "Liga_Individuales",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -192,6 +220,25 @@ namespace BackEnd.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Equipos",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    nombreEquipo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Partidoid = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Equipos", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Equipos_Partidos_Partidoid",
+                        column: x => x.Partidoid,
+                        principalTable: "Partidos",
+                        principalColumn: "id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Predicciones",
                 columns: table => new
                 {
@@ -199,7 +246,8 @@ namespace BackEnd.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     tipo_Resultado = table.Column<int>(type: "int", nullable: false),
                     partidoid = table.Column<int>(type: "int", nullable: false),
-                    usuarioid = table.Column<int>(type: "int", nullable: false)
+                    usuarioid = table.Column<int>(type: "int", nullable: false),
+                    idPuntuacionUsuario = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -219,41 +267,14 @@ namespace BackEnd.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Puntuaciones",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    puntos = table.Column<int>(type: "int", nullable: false),
-                    pencaid = table.Column<int>(type: "int", nullable: false),
-                    usuarioid = table.Column<int>(type: "int", nullable: false),
-                    estado = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Puntuaciones", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_Puntuaciones_Pencas_pencaid",
-                        column: x => x.pencaid,
-                        principalTable: "Pencas",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Puntuaciones_Usuario_usuarioid",
-                        column: x => x.usuarioid,
-                        principalTable: "Usuario",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Apuestas",
                 columns: table => new
                 {
                     id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     competenciaId = table.Column<int>(type: "int", nullable: false),
                     usuarioid = table.Column<int>(type: "int", nullable: false),
-                    idGanador = table.Column<int>(type: "int", nullable: false)
+                    idGanador = table.Column<int>(type: "int", nullable: false),
+                    idPuntuacionUsuario = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -311,6 +332,34 @@ namespace BackEnd.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Puntuaciones",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    puntos = table.Column<int>(type: "int", nullable: false),
+                    pencaid = table.Column<int>(type: "int", nullable: false),
+                    usuarioid = table.Column<int>(type: "int", nullable: false),
+                    estado = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Puntuaciones", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Puntuaciones_Pencas_pencaid",
+                        column: x => x.pencaid,
+                        principalTable: "Pencas",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Puntuaciones_Usuario_usuarioid",
+                        column: x => x.usuarioid,
+                        principalTable: "Usuario",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Mensajes",
                 columns: table => new
                 {
@@ -332,6 +381,25 @@ namespace BackEnd.Data.Migrations
                         name: "FK_Mensajes_Pencas_Pencaid",
                         column: x => x.Pencaid,
                         principalTable: "Pencas",
+                        principalColumn: "id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Historials",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    tipo_Historial = table.Column<int>(type: "int", nullable: false),
+                    Equipoid = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Historials", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Historials_Equipos_Equipoid",
+                        column: x => x.Equipoid,
+                        principalTable: "Equipos",
                         principalColumn: "id");
                 });
 
@@ -361,9 +429,14 @@ namespace BackEnd.Data.Migrations
                 column: "Liga_IndividualId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Equipos_Liga_Equipoid",
+                name: "IX_Equipos_Partidoid",
                 table: "Equipos",
-                column: "Liga_Equipoid");
+                column: "Partidoid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Historials_Equipoid",
+                table: "Historials",
+                column: "Equipoid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Mensajes_ChatId",
@@ -391,6 +464,11 @@ namespace BackEnd.Data.Migrations
                 column: "Liga_Equipoid");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Pencas_AdministradorId",
+                table: "Pencas",
+                column: "AdministradorId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Pencas_Empresaid",
                 table: "Pencas",
                 column: "Empresaid");
@@ -399,6 +477,11 @@ namespace BackEnd.Data.Migrations
                 name: "IX_Pencas_liga_Equipoid",
                 table: "Pencas",
                 column: "liga_Equipoid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pencas_liga_IndividualId",
+                table: "Pencas",
+                column: "liga_IndividualId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Predicciones_partidoid",
@@ -427,7 +510,7 @@ namespace BackEnd.Data.Migrations
                 name: "Apuestas");
 
             migrationBuilder.DropTable(
-                name: "Equipos");
+                name: "Historials");
 
             migrationBuilder.DropTable(
                 name: "Mensajes");
@@ -445,25 +528,34 @@ namespace BackEnd.Data.Migrations
                 name: "Puntuaciones");
 
             migrationBuilder.DropTable(
+                name: "SuperAdmins");
+
+            migrationBuilder.DropTable(
+                name: "Equipos");
+
+            migrationBuilder.DropTable(
                 name: "Chats");
 
             migrationBuilder.DropTable(
                 name: "Competencias");
 
             migrationBuilder.DropTable(
-                name: "Partidos");
+                name: "Pencas");
 
             migrationBuilder.DropTable(
-                name: "Pencas");
+                name: "Partidos");
 
             migrationBuilder.DropTable(
                 name: "Usuario");
 
             migrationBuilder.DropTable(
-                name: "Liga_Individuales");
+                name: "Administradores");
 
             migrationBuilder.DropTable(
                 name: "Empresas");
+
+            migrationBuilder.DropTable(
+                name: "Liga_Individuales");
 
             migrationBuilder.DropTable(
                 name: "Liga_Equipos");

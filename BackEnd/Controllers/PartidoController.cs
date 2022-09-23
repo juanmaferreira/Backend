@@ -4,6 +4,7 @@ using BackEnd.Models.DataTypes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Routing;
 
 namespace BackEnd.Controllers
 {
@@ -42,15 +43,25 @@ namespace BackEnd.Controllers
             if (local == null || visitante == null) return BadRequest();
 
             partido.fechaPartido = dtpartido.fecha;
-            partido.asignarEquipos(local, visitante);
-
-
-
+            partido.visitante_local = new List<Equipo> {visitante, local};  
 
             await _context.Partidos.AddAsync(partido);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetById), new { id = partido.id }, partido);
+        }
+
+        [HttpGet("/HistorialGet/id")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetEquipoById(int id)
+        {
+            var partido =  _context.Partidos.Include(p => p.visitante_local);
+            DtPartido dtPartido = new DtPartido();
+         
+
+
+            return  Ok(partido);
         }
     }
 }

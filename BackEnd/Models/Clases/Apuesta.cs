@@ -8,6 +8,8 @@
 
         public int idGanador { get; set; }
 
+        public int idPuntuacionUsuario { get; set; }
+
         
     }
 }

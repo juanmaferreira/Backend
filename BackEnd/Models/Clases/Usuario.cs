@@ -5,8 +5,10 @@ namespace BackEnd.Models.Clases
 {
    public enum Tipo_Rol
     {
+        SuperAdmin,
         Admin,
-        Comun
+        Comun,
+        Empresa
     }
 
     public class Usuario

@@ -18,7 +18,7 @@
         public List<Nombre> posiciones { get; set; }
         public List<Participante> participantes { get; set; }
 
-        public int idPenca { get; set; }
+        public List<Apuesta> apuestas { get; set; }
 
         public Competencia()
         {
