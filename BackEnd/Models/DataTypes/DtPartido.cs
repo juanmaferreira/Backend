@@ -4,11 +4,13 @@ namespace BackEnd.Models.DataTypes
 {
     public class DtPartido
     {
-
+        public int Id { get; set; }
         public DateTime fecha   { get; set; }
 
-        public Equipo local { get; set; }
+        public int Idlocal { get; set; }
 
-        public Equipo visitante { get; set; }
+        public int Idvisitante { get; set; }
+
+        public Tipo_Resultado resultado { get; set; }
     }
 }

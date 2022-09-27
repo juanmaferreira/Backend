@@ -10,6 +10,8 @@ namespace BackEnd.Models.Clases{
         public string nombreLiga { get; set; }
 		public List<Partido> partidos { get; set; }
 
+		public List<Penca> pencas { get; set; }
+
 		public int topePartidos { get; set; }
 
         public Liga_Equipo() { 

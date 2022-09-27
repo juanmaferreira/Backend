@@ -4,7 +4,8 @@
     {
         Aceptado,
         Rechazado,
-        Pendiente
+        Pendiente,
+        Invitado
     }
     public class Puntuacion
     {

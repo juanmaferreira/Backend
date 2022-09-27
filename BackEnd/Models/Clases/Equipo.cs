@@ -13,5 +13,19 @@ namespace BackEnd.Models.Clases{
         public string nombreEquipo { get; set; }
 
         public List<Historial> historiales { get; set; }
+
+        public List<Partido> partidos { get; set; }
+
+
+        public void agregarHistorial(Tipo_Historial tipo)
+        {
+            Historial historial = new Historial();
+            historial.tipo_Historial = tipo;
+            if (this.historiales == null)
+            {
+                this.historiales = new List<Historial>();
+            }
+            this.historiales.Add(historial);
+        }
     }
 }

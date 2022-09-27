@@ -4,7 +4,9 @@ using BackEnd.Models.DataTypes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Mail;
 using System.Runtime.Intrinsics.X86;
+using SmtpClient = System.Net.Mail.SmtpClient;
 
 namespace BackEnd.Controllers
 {
@@ -15,22 +17,25 @@ namespace BackEnd.Controllers
         private readonly EntidadesDbContext _context;
         public UsuarioController(EntidadesDbContext context) => _context = context;
 
-        [HttpGet("id")]
+        [HttpGet("{id}")]
         [ProducesResponseType(typeof(Usuario), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetById(int id)
         {
             var usuario = await _context.Usuario.FindAsync(id);
+            if (usuario == null) return BadRequest("No existe el usuario");
+
             DtUsuario dtUsuario = new DtUsuario();
             dtUsuario.tipo_rol = usuario.tipoRol;
             dtUsuario.email = usuario.email;
             dtUsuario.Nombre = usuario.nombre;
             dtUsuario.billetera = usuario.billetera;
+            dtUsuario.Id = usuario.id;
 
             return usuario == null ? NotFound() : Ok(dtUsuario);
         }
 
-        [HttpPost("/login")]
+        [HttpPost("login")]
         [ProducesResponseType(typeof(Usuario), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> login(DtLogin dtLogin)
@@ -61,10 +66,10 @@ namespace BackEnd.Controllers
             return BadRequest();
         }
 
-        [HttpPost("/Registro")]
+        [HttpPost("Registro")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Registrarse(DtRegistro dtRegistro)
+        public async Task<IActionResult> Registrarse([FromBody] DtRegistro dtRegistro)
         {
             DbSet<Usuario> users = _context.Usuario;
             foreach(var aux in users)
@@ -85,5 +90,41 @@ namespace BackEnd.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = usuario.id }, usuario);
         }
+
+        [HttpPut("recuperarContraseña")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> recuperarContraseña([FromBody] string email)
+        {
+            DbSet<Usuario> users = _context.Usuario;
+            Usuario usuario = new Usuario();
+            foreach (var aux in users)
+            {
+                if (aux.email == email)
+                {
+                    usuario = aux;
+                }
+            }
+            usuario.password = usuario.generarContraseña();
+
+ 
+            string texto = "Hola, aqui te dejamos tu nueva contraseña. Esperemos no te vuelvas a olvidarte de ella :P. Contraseña: " + usuario.password;
+            MailMessage mensaje = new MailMessage("penqueapp@gmail.com",email, "[PenqueApp] Nueva contraseña",texto);
+            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com");
+            smtpClient.EnableSsl = true;
+            smtpClient.UseDefaultCredentials = false;
+            smtpClient.Host = "smtp.gmail.com";
+            smtpClient.Port = 587;
+            smtpClient.Credentials = new System.Net.NetworkCredential("penqueapp@gmail.com", "qwknavxpudbjjtfr");
+
+            smtpClient.Send(mensaje);
+            smtpClient.Dispose();
+            _context.Entry(usuario).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        
     }
 }

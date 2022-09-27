@@ -21,35 +21,40 @@ namespace BackEnd.Controllers
             return await _context.Equipos.ToListAsync();
         }
 
-        [HttpGet("id")]
+        [HttpGet("{id}")]
         [ProducesResponseType(typeof(Equipo), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetById(int id)
         {
+            DtEquipo dtequipo = new DtEquipo();
             var equipo = await _context.Equipos.FindAsync(id);
-            Console.Out.WriteLine(equipo.historiales);
+            dtequipo.Id = id;
+            dtequipo.Name = equipo.nombreEquipo;
+            Console.Out.WriteLine(dtequipo);
 
             return equipo == null ? NotFound() : Ok(equipo.historiales);
         }
 
-        [HttpPost("/altaEquipo")]
+        [HttpPost("altaEquipo")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> altaEquipo(Equipo equipo)
+        public async Task<IActionResult> altaEquipo(DtEquipo equipo)
         {
+            Equipo team = new Equipo();
+            team.nombreEquipo = equipo.Name;
             
-            await _context.Equipos.AddAsync(equipo);
+            await _context.Equipos.AddAsync(team);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetById), new { id = equipo.id }, equipo);
+            return CreatedAtAction(nameof(GetById), new { id = team.id }, equipo);
         }
 
-        [HttpPut("/agregarHistorial/{id}")]
+        [HttpPut("agregarHistorial/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> actualizarHistorial(int id, Tipo_Historial tipo)
+        public async Task<IActionResult> actualizarHistorial(int id, [FromBody] Tipo_Historial tipo)
         {
             var team = await _context.Equipos.FindAsync(id);
-            if (team == null) return BadRequest();
+            if (team == null) return BadRequest("El equipo ingresado es NULL");
 
             Historial historial = new Historial();
             historial.tipo_Historial = tipo;
@@ -65,7 +70,7 @@ namespace BackEnd.Controllers
             return NoContent();
         }
 
-        [HttpGet("/mostrarHistorial/{id}")]
+        [HttpGet("mostrarHistorial/{id}")]
         [ProducesResponseType(typeof(Equipo), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetEquipoById(int id)
