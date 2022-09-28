@@ -37,7 +37,7 @@ namespace BackEnd.Controllers
             Participante part = new Participante();
             part.Id = participante.Id;
             part.nombre = participante.nombre;
-
+            part.Area = participante.Area;
             DbSet<Participante> p = _context.Participantes;
             foreach (var aux in p)
             {
@@ -48,6 +48,28 @@ namespace BackEnd.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetById), new { id = participante.Id }, participante);
+        }
+
+        [HttpGet("mostrarParticipantesPorArea/{area}")]
+        [ProducesResponseType(typeof(Participante), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetParticipanteByArea(Tipo_Area area)
+        {
+            var participante = _context.Participantes;
+            List<DtParticipante> dtP = new List<DtParticipante>();
+            foreach (var aux in participante)
+            {
+                if(aux.Area.Equals(area))
+                {
+                    DtParticipante dtParticipante = new DtParticipante();
+                    dtParticipante.Area = aux.Area;
+                    dtParticipante.Id = aux.Id;
+                    dtParticipante.nombre = aux.nombre;
+                    dtP.Add(dtParticipante);
+                }
+            }
+            
+            return Ok(dtP);
         }
     }
 }
