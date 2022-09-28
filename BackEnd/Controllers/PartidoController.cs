@@ -47,7 +47,8 @@ namespace BackEnd.Controllers
             if (local.id == visitante.id) return BadRequest("No puedes elejir que compita contra si mismo");
 
             partido.fechaPartido = dtpartido.fecha;
-            partido.visitante_local = new List<Equipo> {visitante, local};  
+            partido.visitante_local = new List<Equipo> {visitante, local};
+            partido.enUso = false;
 
             if(local.partidos == null)
             {

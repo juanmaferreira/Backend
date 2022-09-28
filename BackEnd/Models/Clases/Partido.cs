@@ -21,6 +21,8 @@ namespace BackEnd.Models.Clases{
 		public List <Equipo> visitante_local { get; set; }
         
         public List<Prediccion> predicciones { get; set; }
+
+        public bool enUso { get; set; }
 	}
 
 }
