@@ -55,22 +55,58 @@ namespace BackEnd.Controllers
             if (ligaE == null) return BadRequest("No existe la liga");
 
             if (ligaE.partidos != null){ 
-                if(ligaE.partidos.Count >= ligaE.topePartidos) {    
+                if(ligaE.topePartidos == 0) {
+                    
                     return BadRequest("Ya esta completo todos los slots");
+                    
                 }
             }
             var partido = await _context.Partidos.FindAsync(dtPartido.Id);
             if (partido == null) return BadRequest("No existe el partido");
+            if (partido.enUso) return BadRequest("Este partido ya existe en otra liga");
             if (ligaE.partidos == null)
             {
                 ligaE.partidos = new List<Partido>();
             }
+            ligaE.topePartidos--;
             ligaE.partidos.Add(partido);
+            partido.enUso = true;
 
             _context.Entry(ligaE).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
+
+        [HttpGet("getPartidos/{id}")]
+        [ProducesResponseType(typeof(Liga_Equipo), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> getPartidos(int id)
+        {
+            var ligaE = _context.Liga_Equipos.Include(e => e.partidos);
+
+            List<DtPartido> partidosList = new List<DtPartido>();
+            
+           
+            foreach (var item in ligaE)
+            {
+                if (item.id == id)
+                {
+                    foreach (var aux in item.partidos)
+                    {
+                        DtPartido partido = new DtPartido();
+                        partido.Id = aux.id;
+                        partido.fecha = aux.fechaPartido;
+                        partido.resultado = aux.resultado;
+
+                        partidosList.Add(partido);
+                    }
+                    return Ok(partidosList);
+                }
+            }
+
+            return ligaE == null ? NotFound() : Ok(ligaE);
+        }
+
     }
 }
