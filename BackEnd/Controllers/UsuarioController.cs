@@ -71,12 +71,30 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Registrarse([FromBody] DtRegistro dtRegistro)
         {
-            DbSet<Usuario> users = _context.Usuario;
-            foreach(var aux in users)
+            DbSet<Usuario> usuarios = _context.Usuario;
+            DbSet<Empresa> empresas = _context.Empresas;
+            DbSet<Administrador> administradores = _context.Administradores;
+            DbSet<SuperAdmin> superadmins = _context.SuperAdmins;
+            foreach (var aux in empresas)
             {
-                if (aux.email == dtRegistro.email) return BadRequest();
+                if (aux.email == dtRegistro.email) return BadRequest("Ya existe alguien registrada con ese mail");
             }
-            
+
+            foreach (var aux in usuarios)
+            {
+                if (aux.email == dtRegistro.email) return BadRequest("Ya existe alguien registrada con ese mail");
+            }
+
+            foreach (var aux in administradores)
+            {
+                if (aux.email == dtRegistro.email) return BadRequest("Ya existe alguien registrada con ese mail");
+            }
+
+            foreach (var aux in superadmins)
+            {
+                if (aux.email == dtRegistro.email) return BadRequest("Ya existe alguien registrada con ese mail");
+            }
+
 
             Usuario usuario = new Usuario();
             usuario.email = dtRegistro.email;
