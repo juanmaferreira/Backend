@@ -6,11 +6,13 @@
         public string Nombre { get; set; }
         
         public List<Competencia> competencias { get; set; }
+        public List<Penca> pencas { get; set; }
         public int topeCompetencias { get; set; }
 
         public Liga_Individual()
         {
             competencias = new List<Competencia>();
+            pencas = new List<Penca>();
         }
     }
 }
