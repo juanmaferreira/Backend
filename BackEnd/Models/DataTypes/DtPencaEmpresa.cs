@@ -11,7 +11,7 @@ namespace BackEnd.Models.DataTypes
 
         public int idLiga { get; set; }
 
-        public Tipo_Plan tipoPlan { get; set; }
+        public Tipo_Plan? tipoPlan { get; set; }
 
         public float premioFinal { get; set; }
 

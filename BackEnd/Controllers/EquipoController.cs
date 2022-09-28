@@ -2,6 +2,7 @@
 using BackEnd.Models.Clases;
 using BackEnd.Models.DataTypes;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.Intrinsics.X86;
@@ -30,9 +31,8 @@ namespace BackEnd.Controllers
             var equipo = await _context.Equipos.FindAsync(id);
             dtequipo.Id = id;
             dtequipo.Name = equipo.nombreEquipo;
-            Console.Out.WriteLine(dtequipo);
 
-            return equipo == null ? NotFound() : Ok(equipo.historiales);
+            return equipo == null ? NotFound() : Ok(dtequipo);
         }
 
         [HttpPost("altaEquipo")]
@@ -101,6 +101,8 @@ namespace BackEnd.Controllers
 
             return Ok(historial);
         }
+
+        
     }
 
     

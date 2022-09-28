@@ -74,6 +74,33 @@ namespace BackEnd.Controllers
 
             return Ok(dtEmpresa);
         }
+
+        [HttpGet("misPencas/{id}")]
+        [ProducesResponseType(typeof(Equipo), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> misPencas(int id)
+        {
+            List<DtPencaEmpresa> dtequipo = new List<DtPencaEmpresa>();
+            Empresa empresa = new Empresa();
+            var empresas = _context.Empresas.Include(e => e.pencas_empresa);
+            foreach(var aux in empresas)
+            {
+                if(aux.id == id)
+                {
+                    foreach(var aux2 in aux.pencas_empresa)
+                    {
+                        DtPencaEmpresa dtPE = new DtPencaEmpresa();
+                        dtPE.id = aux2.id;
+                        dtPE.nombre = aux2.nombre;
+                        dtPE.tipoPlan = aux2.tipo_Plan;
+                        dtequipo.Add(dtPE);
+                      
+                    }
+                    return Ok(dtequipo);
+                }
+            }
+            return BadRequest();     
+        }
     }
 
     

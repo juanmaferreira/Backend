@@ -30,10 +30,10 @@ namespace BackEnd.Controllers
             return pencas == null ? NotFound() : Ok(pencas);
         }
 
-        [HttpPost("altaPencaCompartida")]
+        [HttpPost("altaPencaCompartida/equipo")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> altaPencaCompartida(DtPencasCompartida dtPC)
+        public async Task<IActionResult> altaPencaCompartidaEquipo(DtPencasCompartida dtPC)
         {
             Penca penca = new Penca();
 
@@ -44,36 +44,51 @@ namespace BackEnd.Controllers
             penca.pozo = 0;
             penca.fecha_Creacion = new DateTime();
             penca.estado = true;
-
+            penca.color = "";
+            penca.tipo_Liga = Tipo_Liga.Equipo;
+            penca.liga_Individual = null;
             var LigaE = await _context.Liga_Equipos.FindAsync(dtPC.idLiga);
-            var LigaI = await _context.Liga_Individuales.FindAsync(dtPC.idLiga);
-
-           /* if (LigaI != null)
-            {
-                penca.liga_Individual = LigaI;
-                if (LigaI.pencas == null)
-                {
-                    LigaI.pencas = new List<Penca>();
-                }
-                LigaI.pencas.Add(penca);
-            }*/
-            if (LigaE != null)
-            {
-                penca.liga_Equipo = LigaE;
-                if (LigaE.pencas == null)
-                {
-                    LigaE.pencas = new List<Penca>();
-                }
-                LigaE.pencas.Add(penca);
-
-            }
+            if (LigaE == null) return BadRequest("No existe la liga");
+            
+            penca.liga_Equipo = LigaE;
+            if(LigaE.pencas == null) { LigaE.pencas = new List<Penca>(); }
+            LigaE.pencas.Add(penca);
             await _context.Pencas.AddAsync(penca);
             await _context.SaveChangesAsync();
 
             return Ok(dtPC);
         }
 
-        [HttpPost("altaPencaEmpresa")]
+        [HttpPost("altaPencaCompartida/individual")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> altaPencaCompartidaIndividual(DtPencasCompartida dtPC)
+        {
+            Penca penca = new Penca();
+
+            penca.nombre = dtPC.nombre;
+            penca.tipo_Deporte = dtPC.tipoDeporte;
+            penca.tipo_Penca = Tipo_Penca.Compartida;
+            penca.entrada = dtPC.entrada;
+            penca.pozo = 0;
+            penca.fecha_Creacion = new DateTime();
+            penca.estado = true;
+            penca.color = "";
+            penca.tipo_Liga = Tipo_Liga.Individual;
+            penca.liga_Equipo = null;
+            var LigaI = await _context.Liga_Individuales.FindAsync(dtPC.idLiga);
+            if (LigaI == null) return BadRequest("No existe la liga");
+
+            penca.liga_Individual = LigaI;
+            if (LigaI.pencas == null) { LigaI.pencas = new List<Penca>(); }
+            LigaI.pencas.Add(penca);
+            await _context.Pencas.AddAsync(penca);
+            await _context.SaveChangesAsync();
+
+            return Ok(dtPC);
+        }
+
+        [HttpPost("altaPencaEmpresa/equipo")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> altaPencaEmpresa(DtPencaEmpresa dtPE)
@@ -87,20 +102,15 @@ namespace BackEnd.Controllers
             penca.pozo = dtPE.premioFinal;
             penca.fecha_Creacion = new DateTime();
             penca.estado = true;
+            penca.color = "";
+            penca.tipo_Liga = Tipo_Liga.Equipo;
+            penca.liga_Individual = null;
 
             var LigaE = await _context.Liga_Equipos.FindAsync(dtPE.idLiga);
-            var LigaI = await _context.Liga_Individuales.FindAsync(dtPE.idLiga);
             var empresa = await _context.Empresas.FindAsync(dtPE.idEmpresa);
+            if (LigaE == null) return BadRequest("No existe la liga");
+            if (empresa == null) return BadRequest("No existe la empresa");
 
-            /* if (LigaI != null)
-           {
-               penca.liga_Individual = LigaI;
-               if (LigaI.pencas == null)
-               {
-                   LigaI.pencas = new List<Penca>();
-               }
-               LigaI.pencas.Add(penca);
-           }*/
             if (LigaE != null)
             {
                 penca.liga_Equipo = LigaE;
@@ -119,7 +129,52 @@ namespace BackEnd.Controllers
                 empresa.pencas_empresa = new List<Penca>();
             }
             empresa.pencas_empresa.Add(penca);
-            await _context.Empresas.AddAsync(empresa);
+            await _context.SaveChangesAsync();
+
+            return Ok(dtPE);
+        }
+
+        [HttpPost("altaPencaEmpresa/individual")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> altaPencaEmpresaIndividual(DtPencaEmpresa dtPE)
+        {
+            Penca penca = new Penca();
+
+            penca.nombre = dtPE.nombre;
+            penca.tipo_Deporte = dtPE.tipoDeporte;
+            penca.tipo_Penca = Tipo_Penca.Empresa;
+            penca.entrada = dtPE.entrada;
+            penca.pozo = dtPE.premioFinal;
+            penca.fecha_Creacion = new DateTime();
+            penca.estado = true;
+            penca.color = "";
+            penca.tipo_Liga = Tipo_Liga.Equipo;
+            penca.liga_Equipo = null;
+
+            var LigaI = await _context.Liga_Individuales.FindAsync(dtPE.idLiga);
+            var empresa = await _context.Empresas.FindAsync(dtPE.idEmpresa);
+            if (LigaI == null) return BadRequest("No existe la liga");
+            if (empresa == null) return BadRequest("No existe la empresa");
+
+            if (LigaI != null)
+            {
+                penca.liga_Individual = LigaI;
+                if (LigaI.pencas == null)
+                {
+                    LigaI.pencas = new List<Penca>();
+                }
+                LigaI.pencas.Add(penca);
+
+            }
+
+            await _context.Pencas.AddAsync(penca);
+
+            if (empresa.pencas_empresa == null)
+            {
+                empresa.pencas_empresa = new List<Penca>();
+            }
+            empresa.pencas_empresa.Add(penca);
             await _context.SaveChangesAsync();
 
             return Ok(dtPE);

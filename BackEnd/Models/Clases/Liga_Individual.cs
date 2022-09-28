@@ -14,5 +14,10 @@
             competencias = new List<Competencia>();
             pencas = new List<Penca>();
         }
+
+        public static implicit operator Liga_Individual(Liga_Equipo v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

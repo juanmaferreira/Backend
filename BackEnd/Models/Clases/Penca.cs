@@ -53,8 +53,8 @@ namespace BackEnd.Models.Clases
         public float? pozo { get; set; }
 
         //Relaciones
-        public Liga_Equipo liga_Equipo { get; set; }
-        public Liga_Individual liga_Individual { get; set; }
+        public Liga_Equipo? liga_Equipo { get; set; }
+        public Liga_Individual? liga_Individual { get; set; }
 
         public List<Puntuacion> participantes_puntos { get; set; } // Aca guarda todas las puntuaciones de cada participante para luego ranquearlo y entregar el premio
 
