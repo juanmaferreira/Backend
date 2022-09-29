@@ -143,6 +143,155 @@ namespace BackEnd.Controllers
             return NoContent();
         }
 
-        
+
+        [HttpPost("unirseALaPenca")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> unirseALaPenca(DtJuego dtJ)
+        {
+            var usuario = await _context.Usuario.FindAsync(dtJ.idUsuario);
+            var penca = await _context.Pencas.FindAsync(dtJ.idPenca);
+            if (penca == null) return BadRequest("No existe la penca");
+            if (usuario == null) return BadRequest("No existe el usuario");
+
+            /* if (usuario.billetera < penca.entrada) return BadRequest("El usuario no tiene saldo suficiente");
+             usuario.billetera -= penca.entrada;*/
+
+            Puntuacion puntuacion = new Puntuacion();
+            puntuacion.penca = penca;
+            puntuacion.estado = estado_Penca.Aceptado;
+            puntuacion.usuario = usuario;
+            puntuacion.puntos = 0;
+
+            if (usuario.puntos_por_penca == null)
+            {
+                usuario.puntos_por_penca = new List<Puntuacion>();
+            }
+            usuario.puntos_por_penca.Add(puntuacion);
+
+            if (penca.participantes_puntos == null)
+            {
+                penca.participantes_puntos = new List<Puntuacion>();
+            }
+            penca.participantes_puntos.Add(puntuacion);
+            penca.pozo += penca.entrada;
+
+            _context.Entry(usuario).State = EntityState.Modified;
+            _context.Entry(penca).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [HttpPost("predecirUnPartido")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> predecirUnPartido(DtPredicciones dtP)
+        {
+            var usuario = await _context.Usuario.FindAsync(dtP.idUsuario);
+            var penca = await _context.Pencas.FindAsync(dtP.idPenca);
+            var partido = await _context.Partidos.FindAsync(dtP.idPartido);
+            if (penca == null) return BadRequest("No existe la penca");
+            if (partido == null) return BadRequest("No existe el partido");
+            if (usuario == null) return BadRequest("No existe el usuario");
+
+            Prediccion prediccion = new Prediccion();
+            prediccion.partido = partido;
+            prediccion.tipo_Resultado = dtP.tipo;
+            prediccion.usuario = usuario;
+
+            Usuario user = new Usuario();
+            Penca penca2 = new Penca();
+
+            var usuarios = _context.Usuario.Include(e => e.puntos_por_penca);
+            var pencas = _context.Pencas.Include(e => e.participantes_puntos);
+            foreach (var aux in usuarios)
+            {
+                if (aux.id == dtP.idUsuario)
+                {
+                    user = aux;
+                    break;
+                }
+            }
+            foreach (var aux in pencas)
+            {
+                if (aux.id == dtP.idPenca)
+                {
+                    penca2 = aux;
+                    break;
+                }
+            }
+
+            foreach (var u in user.puntos_por_penca)
+            {
+                foreach (var p in penca2.participantes_puntos)
+                {
+                    if (u.id == p.id)
+                    {
+                        prediccion.idPuntuacionUsuario = p.id;
+                        break;
+                    }
+                }
+            }
+
+
+            if (usuario.predicciones == null)
+            {
+                usuario.predicciones = new List<Prediccion>();
+            }
+            usuario.predicciones.Add(prediccion);
+
+            if (partido.predicciones == null)
+            {
+                partido.predicciones = new List<Prediccion>();
+            }
+            partido.predicciones.Add(prediccion);
+
+            _context.Entry(usuario).State = EntityState.Modified;
+            _context.Entry(partido).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [HttpGet("misPencas/{id}")]
+        [ProducesResponseType(typeof(Usuario), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> misPencas(int id)
+        {
+            List<DtPenca> dtPencas = new List<DtPenca>();
+            Usuario user = new Usuario();
+
+            var usuarios = _context.Usuario.Include(e => e.puntos_por_penca);
+            var puntuaciones = _context.Puntuaciones.Include(e => e.penca);
+            foreach (var aux in usuarios)
+            {
+                if (aux.id == id)
+                {
+                    user = aux;
+                    break;
+                }
+            }
+
+            foreach (var puntos in user.puntos_por_penca)
+            {
+                foreach (var pencas in puntuaciones)
+                {
+                    if (pencas.id == puntos.id)
+                    {
+                        DtPenca dtPenca = new DtPenca();
+                        dtPenca.id = pencas.penca.id;
+                        dtPenca.nombre = pencas.penca.nombre;
+                        dtPenca.tipo_Deporte = pencas.penca.tipo_Deporte;
+                        dtPenca.fecha_Creacion = pencas.penca.fecha_Creacion;
+
+                        dtPencas.Add(dtPenca);
+                    }
+                }
+            }
+            return Ok(dtPencas);
+        }
+
+
     }
 }
