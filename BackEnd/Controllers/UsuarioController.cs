@@ -292,6 +292,27 @@ namespace BackEnd.Controllers
             return Ok(dtPencas);
         }
 
+        [HttpPost("comentarEnForo")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> comentarEnForo(DtMensajeForo dtMensajeForo)
+        {
+            var penca = await _context.Pencas.FindAsync(dtMensajeForo.IdPenca);
+            if (penca == null) return BadRequest("No existe la Penca");
+            var usuario = await _context.Usuario.FindAsync(dtMensajeForo.IdUsuario);
+            if (usuario == null) return BadRequest("No existe el Usuario");
+            Mensaje mensaje = new Mensaje();
+            mensaje.mensaje = ">" + usuario.nombre + ": " + dtMensajeForo.Comentario + ".";
+            if (penca.foro == null)
+            {
+                List<Mensaje> foro = new List<Mensaje>();
+            }
+            penca.foro.Add(mensaje);
+            _context.Entry(penca).State = EntityState.Modified; ;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
 
     }
 }

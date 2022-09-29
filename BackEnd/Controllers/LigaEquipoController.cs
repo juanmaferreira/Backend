@@ -108,5 +108,17 @@ namespace BackEnd.Controllers
             return ligaE == null ? NotFound() : Ok(ligaE);
         }
 
+        [HttpPut("chequearFinalizada/{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> chequearFinalizada(int id)
+        {
+            var liga = await _context.Liga_Equipos.FindAsync(id);
+            if (liga == null) return BadRequest("No existe la Liga de Equipos");
+            liga.actualizarEstado();
+            _context.Entry(liga).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
     }
 }

@@ -179,5 +179,53 @@ namespace BackEnd.Controllers
 
             return Ok(dtPE);
         }
+
+
+        [HttpGet("verForo/{id}")]
+        [ProducesResponseType(typeof(Penca), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetMensajesForo(int id)
+        {
+            var penca = _context.Pencas.Include(e => e.foro);
+            List<string> auxList = new List<string>();
+
+            foreach (var aux in penca)
+            {
+                if (aux.id == id)
+                {
+                    foreach (var foros in aux.foro)
+                    {
+                        auxList.Add(foros.mensaje);
+                    }
+                    return Ok(auxList);
+                }
+            }
+            return BadRequest("No existe la Penca");
+        }
+
+        [HttpPut("chequearLigaEquipoFinalizada/{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> chequearLigaEquipoFinalizada(int id)
+        {
+            var penca = await _context.Pencas.FindAsync(id);
+            if (penca == null) return BadRequest("No existe la Penca");
+            penca.chequearEstadoLigaIndividual();
+            _context.Entry(penca).State = EntityState.Modified;
+            return NoContent();
+        }
+
+        [HttpPut("chequearLigaIndividualFinalizada/{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> chequearLigaIndividualFinalizada(int id)
+        {
+            var penca = await _context.Pencas.FindAsync(id);
+            if (penca == null) return BadRequest("No existe la Penca");
+            penca.chequearEstadoLigaIndividual();
+            _context.Entry(penca).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
     }
 }

@@ -70,6 +70,23 @@ namespace BackEnd.Models.Clases
             liga_Equipo = new Liga_Equipo();
             liga_Individual = new Liga_Individual();
         }
+        public void chequearEstadoLigaEquipo()
+        {
+            if (this.liga_Equipo == null || this.liga_Equipo.activa == false)
+            {
+                this.estado = false;
+            }
+            else this.estado = true;
+        }
+
+        public void chequearEstadoLigaIndividual()
+        {
+            if (this.liga_Individual == null || this.liga_Individual.activa == false)
+            {
+                this.estado = false;
+            }
+            else this.estado = true;
+        }
     }
 }
 

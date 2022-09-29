@@ -118,5 +118,18 @@ namespace BackEnd.Controllers
             }
             return Ok(dtcomp);
         }
+
+        [HttpPut("chequearFinalizada/{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> chequearFinalizada(int id)
+        {
+            var liga = await _context.Liga_Individuales.FindAsync(id);
+            if (liga == null) return BadRequest("No existe la Liga Individual");
+            liga.actualizarEstado();
+            _context.Entry(liga).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
     }
 }
