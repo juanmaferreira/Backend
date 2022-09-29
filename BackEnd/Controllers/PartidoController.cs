@@ -49,6 +49,7 @@ namespace BackEnd.Controllers
             partido.fechaPartido = dtpartido.fecha;
             partido.visitante_local = new List<Equipo> {visitante, local};
             partido.enUso = false;
+            partido.resultado = Tipo_Resultado.Indefinido;
 
             if(local.partidos == null)
             {

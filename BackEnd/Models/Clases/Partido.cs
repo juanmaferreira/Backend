@@ -7,7 +7,8 @@ namespace BackEnd.Models.Clases{
     {
         Local,
         Visitante,
-        Empate
+        Empate,
+        Indefinido
     }
 
     public class Partido{
