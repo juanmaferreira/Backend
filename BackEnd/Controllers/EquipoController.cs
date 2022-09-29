@@ -1,12 +1,8 @@
 ﻿using BackEnd.Data;
 using BackEnd.Models.Clases;
 using BackEnd.Models.DataTypes;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.JsonPatch.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Runtime.Intrinsics.X86;
-
 namespace BackEnd.Controllers
 {
     [Route("api/[controller]")]
