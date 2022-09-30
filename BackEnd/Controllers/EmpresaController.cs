@@ -101,16 +101,20 @@ namespace BackEnd.Controllers
             }
             return BadRequest();     
         }
+
+        [HttpPut("depositarBilleteraEmpresa/{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> depositarBilleteraEmpresa(int id, [FromBody] int monto)
+        {
+            var empresa = await _context.Empresas.FindAsync(id);
+            if (empresa == null) return BadRequest("La Empresa no existe");
+            empresa.agregarFondos(monto);
+            _context.Entry(empresa).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
     }
-    /*
-    [HttpPut("depositarBilleteraEmpresa")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> depositarBilleteraEmpresa(int id, int monto)
-    {
-        var empresa = await _context.Empresas.FindAsync(id);
-        if (empresa == null) return BadRequest("La Empresa no existe");
-        empresa.agregarFondos(monto);
-        return Ok(empresa);
-    }*/
+    
+    
 }
