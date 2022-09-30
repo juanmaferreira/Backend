@@ -235,14 +235,19 @@ namespace BackEnd.Controllers
         public async Task<IActionResult> PencasCompartidasSegunEstado(bool estado)
         {
             var pencas = _context.Pencas;
-            List<Penca> listaDePencas = new List<Penca>();
+            List<DtPencasCompartida> listaDePencas = new List<DtPencasCompartida>();
             if (pencas != null)
             {
                 foreach (var aux in pencas)
                 {
                     if (aux.estado == estado && aux.tipo_Penca == Tipo_Penca.Compartida)
                     {
-                        listaDePencas.Add(aux);
+                        DtPencasCompartida dtP = new DtPencasCompartida();
+                        dtP.id = aux.id;
+                        dtP.nombre = aux.nombre;
+                        dtP.tipoDeporte = aux.tipo_Deporte;
+                        dtP.entrada = aux.entrada;
+                        listaDePencas.Add(dtP);
                     }
                 }
                 return Ok(listaDePencas);
