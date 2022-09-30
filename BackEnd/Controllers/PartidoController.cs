@@ -143,5 +143,15 @@ namespace BackEnd.Controllers
     
             return NoContent();
         }
+
+        [HttpGet("estadisticasPartido/{id}")]
+        [ProducesResponseType(typeof(Partido), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> estadisticasPartido(int id)
+        {
+            var partido = await _context.Partidos.FindAsync(id);
+            if (partido == null) return BadRequest("No existe el partido");
+            return Ok(partido.Estadisticas);
+        }
     }
 }

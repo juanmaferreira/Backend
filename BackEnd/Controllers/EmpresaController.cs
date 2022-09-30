@@ -102,6 +102,15 @@ namespace BackEnd.Controllers
             return BadRequest();     
         }
     }
-
-    
+    /*
+    [HttpPut("depositarBilleteraEmpresa")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> depositarBilleteraEmpresa(int id, int monto)
+    {
+        var empresa = await _context.Empresas.FindAsync(id);
+        if (empresa == null) return BadRequest("La Empresa no existe");
+        empresa.agregarFondos(monto);
+        return Ok(empresa);
+    }*/
 }

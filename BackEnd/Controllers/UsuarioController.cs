@@ -234,7 +234,6 @@ namespace BackEnd.Controllers
                 }
             }
 
-
             if (usuario.predicciones == null)
             {
                 usuario.predicciones = new List<Prediccion>();
@@ -246,6 +245,7 @@ namespace BackEnd.Controllers
                 partido.predicciones = new List<Prediccion>();
             }
             partido.predicciones.Add(prediccion);
+            partido.actualizarEstadisticas(prediccion.tipo_Resultado);
 
             _context.Entry(usuario).State = EntityState.Modified;
             _context.Entry(partido).State = EntityState.Modified;
@@ -431,6 +431,17 @@ namespace BackEnd.Controllers
             }
 
             return Ok(mensajes);
+        }
+
+        [HttpPut("depositarBilleteraUsuario")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> depositarBilleteraUsuario(int id, int monto)
+        {
+            var usuario = await _context.Usuario.FindAsync(id);
+            if (usuario == null) return BadRequest("El usuario no existe");
+            usuario.agregarFondos(monto);
+            return Ok(usuario);
         }
     }
 }

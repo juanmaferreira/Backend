@@ -212,6 +212,7 @@ namespace BackEnd.Controllers
             if (penca == null) return BadRequest("No existe la Penca");
             penca.chequearEstadoLigaIndividual();
             _context.Entry(penca).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
             return NoContent();
         }
 
@@ -226,6 +227,27 @@ namespace BackEnd.Controllers
             _context.Entry(penca).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return NoContent();
+        }
+
+        [HttpGet("PencasCompartidasSegunEstado")]
+        [ProducesResponseType(typeof(Penca), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> PencasCompartidasSegunEstado(bool estado)
+        {
+            var pencas = _context.Pencas;
+            List<Penca> listaDePencas = new List<Penca>();
+            if (pencas != null)
+            {
+                foreach (var aux in pencas)
+                {
+                    if (aux.estado == estado && aux.tipo_Penca == Tipo_Penca.Compartida)
+                    {
+                        listaDePencas.Add(aux);
+                    }
+                }
+                return Ok(listaDePencas);
+            }
+            return BadRequest("No existe la Penca");
         }
     }
 }
