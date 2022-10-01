@@ -56,14 +56,10 @@ namespace BackEnd.Controllers
 
                         return aux == null ? NotFound() : Ok(dtUsuario);
                     }
-                    else
-                    {
-                        return BadRequest();
-                    }
-                        
+                       
                 }    
             }
-            return BadRequest();
+            return BadRequest("No existe el usuario en el sistema");
         }
 
         [HttpPost("Registro")]
@@ -154,8 +150,8 @@ namespace BackEnd.Controllers
             if (penca == null) return BadRequest("No existe la penca");
             if (usuario == null) return BadRequest("No existe el usuario");
 
-            /* if (usuario.billetera < penca.entrada) return BadRequest("El usuario no tiene saldo suficiente");
-             usuario.billetera -= penca.entrada;*/
+            if (usuario.billetera < penca.entrada) return BadRequest("El usuario no tiene saldo suficiente");
+             usuario.billetera -= penca.entrada;
 
             Puntuacion puntuacion = new Puntuacion();
             puntuacion.penca = penca;
