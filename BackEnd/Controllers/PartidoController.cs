@@ -149,9 +149,41 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> estadisticasPartido(int id)
         {
-            var partido = await _context.Partidos.FindAsync(id);
-            if (partido == null) return BadRequest("No existe el partido");
-            return Ok(partido.Estadisticas);
+            var partidos =  _context.Partidos.Include(p => p.predicciones);
+            if (partidos == null) return BadRequest("No hay partidos  en la lista");
+            Partido partido = new Partido();
+            foreach(var aux in partidos){ 
+                if(aux.id == id)
+                {
+                    partido = aux;
+                    break;
+                }
+            }
+            int visitante = 0;
+            int local = 0;
+            int empate = 0;
+
+            foreach(var aux2 in partido.predicciones)
+            {
+                if(aux2.tipo_Resultado == Tipo_Resultado.Local)
+                {
+                    local++;
+                }
+                if (aux2.tipo_Resultado == Tipo_Resultado.Visitante)
+                {
+                    visitante++;
+                }
+                if (aux2.tipo_Resultado == Tipo_Resultado.Empate)
+                {
+                    empate++;
+                }
+            }
+            DtEstadisticas dtE = new DtEstadisticas();
+            dtE.local = local;
+            dtE.visitante = visitante;
+            dtE.empate = empate;
+
+            return Ok(dtE);
         }
     }
 }

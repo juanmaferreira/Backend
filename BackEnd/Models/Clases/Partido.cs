@@ -28,23 +28,5 @@ namespace BackEnd.Models.Clases{
         public List<Prediccion> predicciones { get; set; }
 
         public bool enUso { get; set; }
-
-        public DtEstadisticas Estadisticas { get; set; }
-
-        public void actualizarEstadisticas(Tipo_Resultado prediccion)
-        {
-            if (prediccion == Tipo_Resultado.Local)
-            {
-                this.Estadisticas.local++;
-            }
-            else if (prediccion == Tipo_Resultado.Visitante)
-            {
-                this.Estadisticas.visitante++;
-            }
-            else if (prediccion == Tipo_Resultado.Empate)
-            {
-                this.Estadisticas.empate++;
-            }
-        }
     }
 }
