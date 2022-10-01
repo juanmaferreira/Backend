@@ -318,8 +318,12 @@ namespace BackEnd.Controllers
         [HttpPut("enviarMensaje")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> enviarMensaje(int idUsuario, int idEmpresa, string mensaje)
+        public async Task<IActionResult> enviarMensaje(DtMensaje message)
         {
+            int idUsuario = message.IdUsuario;
+            int idEmpresa = message.IdEmpresa;
+            string mensaje = message.Mensaje;
+
             var usuario = await _context.Usuario.FindAsync(idUsuario);
             if (usuario == null) return BadRequest("El usuario no existe");
 
@@ -330,22 +334,26 @@ namespace BackEnd.Controllers
             {
                 usuario.chats = new List<Chat>();
             }
+            if(empresa.chats == null)
+            {
+                empresa.chats = new List<Chat>();
+            }
 
             Chat chat = new Chat();
             chat.usuario = usuario;
             chat.empresa = empresa;
 
             Mensaje m = new Mensaje();
-            m.mensaje = "☻" + mensaje;
+            m.mensaje = "☻" + mensaje; //alt+258
             await _context.Mensajes.AddAsync(m);
 
             chat.mensajes.Add(m);
 
             usuario.chats.Add(chat);
 
-            await _context.SaveChangesAsync();
-
             empresa.chats.Add(chat);
+
+            await _context.Chats.AddAsync(chat);
 
             await _context.SaveChangesAsync();
 
@@ -367,70 +375,46 @@ namespace BackEnd.Controllers
                     break;
                 }
             }
-            //var chats = _context.Chats.Include(c => c.mensajes);
             List<Chat> chats = usuarioAux.chats;
-            List<Chat> chat2 = new List<Chat>();
+            List<DtChat> chat2 = new List<DtChat>();
+
+            var ch = _context.Chats.Include(c => c.empresa);
 
             List<Mensaje> mensajes = new List<Mensaje>();
             foreach (var auxC in chats)
             {
-                Chat chat = new Chat();
-                chat.empresa.nombre = auxC.empresa.nombre;
-                chat.usuario.nombre = auxC.usuario.nombre;
-                chat2.Add(chat);
-            }
-            /*foreach (var auxC in chat2)
-            {
-                foreach (var auxC2 in auxC.mensajes)
+                foreach (var auxE in ch)
                 {
-                    mensajes.Add(auxC2);
-                }
-
-            }*/
-
+                    if(auxE.Id == auxC.Id)
+                    {
+                        DtChat chat = new DtChat();
+                        chat.Id = auxC.Id;
+                        chat.empresa = auxE.empresa.nombre;
+                        chat.usuario = auxC.usuario.nombre;
+                        chat2.Add(chat);
+                    }
+                }                
+            }
             return Ok(chat2);
         }
 
         [HttpGet("mostrarMensajes")]
         [ProducesResponseType(typeof(Mensaje), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetMensajeById(int idUsuario)
+        public async Task<IActionResult> GetMensajeById(int idChat)
         {
-            var usuario = _context.Usuario.Include(u => u.chats);
-            int usu;
-            Usuario usuarioAux = new Usuario();
-            foreach (var aux in usuario)
+            var chat = _context.Chats.Include(c => c.mensajes);
+            Chat chatAux = new Chat();
+            foreach (var aux in chat)
             {
-                if (aux.id == idUsuario)
+                if (aux.Id == idChat)
                 {
-                    usuarioAux = aux;
+                    chatAux = aux;
                     break;
                 }
             }
-            var chats = _context.Chats.Include(c => c.mensajes);
-            List<Chat> chat2 = new List<Chat>();
-            List<Mensaje> mensajes = new List<Mensaje>();
-            foreach (var auxC in chats)
-            {
-                chat2.Add(auxC);
-
-            }
-            foreach (var auxC in chat2)
-            {
-                foreach (var auxC2 in auxC.mensajes)
-                {
-                    //usu = auxC2.mensaje.IndexOf("☻");
-                    //if(usu == 1)
-                    //{
-
-                    mensajes.Add(auxC2);
-                    //}
-
-                }
-
-            }
-
-            return Ok(mensajes);
+            List<Mensaje> mensajes = chatAux.mensajes;
+            return Ok(chatAux.mensajes);
         }
     }
 }
