@@ -11,7 +11,7 @@ namespace BackEnd.Models.DataTypes
 
         public float? entrada { get; set; }
 
-        public float pozo { get; set; }
+        public float? pozo { get; set; }
 
         public int idLiga { get; set; }
 
