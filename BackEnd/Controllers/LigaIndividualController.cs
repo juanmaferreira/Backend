@@ -38,6 +38,7 @@ namespace BackEnd.Controllers
             Liga_Individual liga = new Liga_Individual();
             liga.Nombre = ligaI.Nombre;
             liga.topeCompetencias = ligaI.topeCompetencias;
+            liga.activa = true;
             await _context.Liga_Individuales.AddAsync(liga);
             await _context.SaveChangesAsync();
 

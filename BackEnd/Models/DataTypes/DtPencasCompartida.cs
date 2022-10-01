@@ -9,7 +9,7 @@ namespace BackEnd.Models.DataTypes
 
         public Tipo_Deporte tipoDeporte { get; set; }
 
-        public float entrada { get; set; }
+        public float? entrada { get; set; }
 
         public float pozo { get; set; }
 

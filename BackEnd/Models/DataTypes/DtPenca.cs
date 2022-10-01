@@ -14,7 +14,7 @@ namespace BackEnd.Models.DataTypes
 
         public Tipo_Deporte tipo_Deporte { get; set; }
 
-        public float entrada { get; set; }
+        public float? entrada { get; set; }
 
         public string color { get; set; }
     }

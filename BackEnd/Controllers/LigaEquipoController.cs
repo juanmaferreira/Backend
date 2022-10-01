@@ -39,6 +39,7 @@ namespace BackEnd.Controllers
 
             ligaE.nombreLiga = dtLigaEquipo.nombreLiga;
             ligaE.topePartidos = dtLigaEquipo.tope;
+            ligaE.activa = true;
 
             await _context.Liga_Equipos.AddAsync(ligaE);
             await _context.SaveChangesAsync();

@@ -18,17 +18,18 @@
         {
             throw new NotImplementedException();
         }
-        public void actualizarEstado()
+        public bool actualizarEstado()
         {
             this.activa = false;
             foreach (var competencia in this.competencias)
             {
-                if (competencia.posiciones.Count == 0)
+                if (competencia.posiciones == null)
                 {
                     this.activa = true;
                     break;
                 }
             }
+        return this.activa;
         }
     }
 }

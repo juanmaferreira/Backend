@@ -208,10 +208,34 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> chequearLigaEquipoFinalizada(int id)
         {
-            var penca = await _context.Pencas.FindAsync(id);
-            if (penca == null) return BadRequest("No existe la Penca");
-            penca.chequearEstadoLigaIndividual();
+            var pencas = _context.Pencas.Include(le => le.liga_Equipo);
+            if (pencas == null) return BadRequest("No existen pencas");
+            Penca penca = new Penca();
+            foreach (var aux in pencas)
+            {
+                if (aux.id == id)
+                {
+                    penca = aux;
+                    break;
+                }
+            }
+            if (penca == null) return BadRequest("No existe la penca");
+            var ligasE = _context.Liga_Equipos.Include(p => p.partidos);
+            Liga_Equipo le = new Liga_Equipo();
+            foreach (var aux in ligasE)
+            {
+                if (aux.id == penca.liga_Equipo.id)
+                {
+                    le = aux;
+                    break;
+                }
+            }
+            if (le.actualizarEstado()) return BadRequest("La liga aun no ha finalizado");
+
+            penca.chequearEstadoLigaEquipo();
             _context.Entry(penca).State = EntityState.Modified;
+            _context.Entry(le).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
             return NoContent();
         }
 
@@ -220,12 +244,63 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> chequearLigaIndividualFinalizada(int id)
         {
-            var penca = await _context.Pencas.FindAsync(id);
-            if (penca == null) return BadRequest("No existe la Penca");
-            penca.chequearEstadoLigaIndividual();
+            var pencas = _context.Pencas.Include(le => le.liga_Individual);
+            if (pencas == null) return BadRequest("No existen pencas");
+            Penca penca = new Penca();
+            foreach (var aux in pencas)
+            {
+                if (aux.id == id)
+                {
+                    penca = aux;
+                    break;
+                }
+            }
+            if (penca == null) return BadRequest("No existe la penca");
+
+            var ligasI = _context.Liga_Individuales.Include(c => c.competencias);
+            Liga_Individual li = new Liga_Individual();
+            foreach (var aux in ligasI)
+            {
+                if (aux.Id == penca.liga_Individual.Id)
+                {
+                    li = aux;
+                    break;
+                }
+            }
+            if (li.actualizarEstado()) return BadRequest("La liga aun no ha finalizado");
+
+            penca.chequearEstadoLigaEquipo();
             _context.Entry(penca).State = EntityState.Modified;
+            _context.Entry(li).State = EntityState.Modified;
             await _context.SaveChangesAsync();
+
             return NoContent();
+        }
+
+        [HttpGet("PencasCompartidasSegunEstado")]
+        [ProducesResponseType(typeof(Penca), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> PencasCompartidasSegunEstado(bool estado)
+        {
+            var pencas = _context.Pencas;
+            List<DtPencasCompartida> listaDePencas = new List<DtPencasCompartida>();
+            if (pencas != null)
+            {
+                foreach (var aux in pencas)
+                {
+                    if (aux.estado == estado && aux.tipo_Penca == Tipo_Penca.Compartida)
+                    {
+                        DtPencasCompartida dtP = new DtPencasCompartida();
+                        dtP.id = aux.id;
+                        dtP.nombre = aux.nombre;
+                        dtP.tipoDeporte = aux.tipo_Deporte;
+                        dtP.entrada = aux.entrada;
+                        listaDePencas.Add(dtP);
+                    }
+                }
+                return Ok(listaDePencas);
+            }
+            return BadRequest("No existe la Penca");
         }
     }
 }

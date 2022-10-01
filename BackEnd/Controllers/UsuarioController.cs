@@ -56,14 +56,10 @@ namespace BackEnd.Controllers
 
                         return aux == null ? NotFound() : Ok(dtUsuario);
                     }
-                    else
-                    {
-                        return BadRequest();
-                    }
-                        
+                       
                 }    
             }
-            return BadRequest();
+            return BadRequest("No existe el usuario en el sistema");
         }
 
         [HttpPost("Registro")]
@@ -154,8 +150,8 @@ namespace BackEnd.Controllers
             if (penca == null) return BadRequest("No existe la penca");
             if (usuario == null) return BadRequest("No existe el usuario");
 
-            /* if (usuario.billetera < penca.entrada) return BadRequest("El usuario no tiene saldo suficiente");
-             usuario.billetera -= penca.entrada;*/
+            if (usuario.billetera < penca.entrada) return BadRequest("El usuario no tiene saldo suficiente");
+             usuario.billetera -= penca.entrada;
 
             Puntuacion puntuacion = new Puntuacion();
             puntuacion.penca = penca;
@@ -233,7 +229,6 @@ namespace BackEnd.Controllers
                     }
                 }
             }
-
 
             if (usuario.predicciones == null)
             {
@@ -314,5 +309,120 @@ namespace BackEnd.Controllers
             return NoContent();
         }
 
+
+        [HttpPut("enviarMensaje")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> enviarMensaje(DtMensaje message)
+        {
+            int idUsuario = message.IdUsuario;
+            int idEmpresa = message.IdEmpresa;
+            string mensaje = message.Mensaje;
+
+            var usuario = await _context.Usuario.FindAsync(idUsuario);
+            if (usuario == null) return BadRequest("El usuario no existe");
+
+            var empresa = await _context.Empresas.FindAsync(idEmpresa);
+            if (empresa == null) return BadRequest("La empresa no existe");
+
+            if (usuario.chats == null)
+            {
+                usuario.chats = new List<Chat>();
+            }
+            if(empresa.chats == null)
+            {
+                empresa.chats = new List<Chat>();
+            }
+
+            Chat chat = new Chat();
+            chat.usuario = usuario;
+            chat.empresa = empresa;
+
+            Mensaje m = new Mensaje();
+            m.mensaje = "☻" + mensaje; //alt+258
+            await _context.Mensajes.AddAsync(m);
+
+            chat.mensajes.Add(m);
+
+            usuario.chats.Add(chat);
+
+            empresa.chats.Add(chat);
+
+            await _context.Chats.AddAsync(chat);
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpGet("mostrarChats")]
+        [ProducesResponseType(typeof(Mensaje), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetChatsById(int idUsuario)
+        {
+            var usuario = _context.Usuario.Include(u => u.chats);
+            Usuario usuarioAux = new Usuario();
+            foreach (var aux in usuario)
+            {
+                if (aux.id == idUsuario)
+                {
+                    usuarioAux = aux;
+                    break;
+                }
+            }
+            List<Chat> chats = usuarioAux.chats;
+            List<DtChat> chat2 = new List<DtChat>();
+
+            var ch = _context.Chats.Include(c => c.empresa);
+
+            List<Mensaje> mensajes = new List<Mensaje>();
+            foreach (var auxC in chats)
+            {
+                foreach (var auxE in ch)
+                {
+                    if(auxE.Id == auxC.Id)
+                    {
+                        DtChat chat = new DtChat();
+                        chat.Id = auxC.Id;
+                        chat.empresa = auxE.empresa.nombre;
+                        chat.usuario = auxC.usuario.nombre;
+                        chat2.Add(chat);
+                    }
+                }                
+            }
+            return Ok(chat2);
+        }
+
+        [HttpGet("mostrarMensajes")]
+        [ProducesResponseType(typeof(Mensaje), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetMensajeById(int idChat)
+        {
+            var chat = _context.Chats.Include(c => c.mensajes);
+            Chat chatAux = new Chat();
+            foreach (var aux in chat)
+            {
+                if (aux.Id == idChat)
+                {
+                    chatAux = aux;
+                    break;
+                }
+            }
+            List<Mensaje> mensajes = chatAux.mensajes;
+            return Ok(chatAux.mensajes);
+        }
+
+        [HttpPut("depositarBilleteraUsuario/{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> depositarBilleteraUsuario(int id,[FromBody] int monto)
+        {
+            var usuario = await _context.Usuario.FindAsync(id);
+            if (usuario == null) return BadRequest("El usuario no existe");
+            usuario.agregarFondos(monto);
+            _context.Entry(usuario).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return Ok(usuario);
+        }
     }
 }

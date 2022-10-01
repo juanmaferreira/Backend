@@ -16,7 +16,7 @@ namespace BackEnd.Models.Clases{
         public Liga_Equipo() { 
 			partidos = new List<Partido>();
 		}
-        public void actualizarEstado()
+        public bool actualizarEstado()
         {
             this.activa = false;
             foreach (var partido in this.partidos)
@@ -27,6 +27,7 @@ namespace BackEnd.Models.Clases{
                     break;
                 }
             }
+            return this.activa;
         }
     }
 }

@@ -47,5 +47,9 @@ namespace BackEnd.Models.Clases
             return new String(stringChars);
         }
 
+        public void agregarFondos(float monto)
+        {
+            this.billetera += monto;
+        }
     }
 }
