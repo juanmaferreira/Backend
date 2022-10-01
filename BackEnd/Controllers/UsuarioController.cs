@@ -245,7 +245,6 @@ namespace BackEnd.Controllers
                 partido.predicciones = new List<Prediccion>();
             }
             partido.predicciones.Add(prediccion);
-            partido.actualizarEstadisticas(prediccion.tipo_Resultado);
 
             _context.Entry(usuario).State = EntityState.Modified;
             _context.Entry(partido).State = EntityState.Modified;

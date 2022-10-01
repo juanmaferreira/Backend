@@ -106,7 +106,7 @@ namespace BackEnd.Controllers
             if (partido == null) return BadRequest("No existe el partido");
 
             var random = new Random();
-            partido.resultado = (Tipo_Resultado)random.Next(Enum.GetNames(typeof(Tipo_Resultado)).Length);
+            partido.resultado = (Tipo_Resultado)random.Next(Enum.GetNames(typeof(Tipo_Resultado)).Length -1);
 
             _context.Entry(partido).State = EntityState.Modified;
 
@@ -137,10 +137,34 @@ namespace BackEnd.Controllers
             }
 
             _context.Entry(play).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            
 
             //SumarPuntos();
-    
+            var partido3 = _context.Partidos.Include(p => p.predicciones);
+            foreach (var item in partido3)
+            {
+                if (item.id == id)
+                {
+                    play = item;
+                    break;
+                }
+            }
+ 
+            foreach (var item in play.predicciones)
+            {
+                if(item.tipo_Resultado == partido.resultado)
+                {
+                    var puntos = await _context.Puntuaciones.FindAsync(item.idPuntuacionUsuario);
+                    if(puntos != null)
+                    {
+                        puntos.puntos++;
+                        _context.Entry(puntos).State = EntityState.Modified;
+                    }
+                }
+            }
+
+
+            await _context.SaveChangesAsync();
             return NoContent();
         }
 
