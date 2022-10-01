@@ -206,7 +206,7 @@ namespace BackEnd.Controllers
             List<Mensaje> mensajes = chatAux.mensajes;
             return Ok(chatAux.mensajes);
         }
-    }
+
         [HttpPut("depositarBilleteraEmpresa/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -220,6 +220,4 @@ namespace BackEnd.Controllers
             return NoContent();
         }
     }
-    
-    
 }
