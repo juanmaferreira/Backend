@@ -106,7 +106,7 @@ namespace BackEnd.Controllers
             if (partido == null) return BadRequest("No existe el partido");
 
             var random = new Random();
-            partido.resultado = (Tipo_Resultado)random.Next(Enum.GetNames(typeof(Tipo_Resultado)).Length);
+            partido.resultado = (Tipo_Resultado)random.Next(Enum.GetNames(typeof(Tipo_Resultado)).Length -1);
 
             _context.Entry(partido).State = EntityState.Modified;
 
@@ -137,11 +137,77 @@ namespace BackEnd.Controllers
             }
 
             _context.Entry(play).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            
 
             //SumarPuntos();
-    
+            var partido3 = _context.Partidos.Include(p => p.predicciones);
+            foreach (var item in partido3)
+            {
+                if (item.id == id)
+                {
+                    play = item;
+                    break;
+                }
+            }
+ 
+            foreach (var item in play.predicciones)
+            {
+                if(item.tipo_Resultado == partido.resultado)
+                {
+                    var puntos = await _context.Puntuaciones.FindAsync(item.idPuntuacionUsuario);
+                    if(puntos != null)
+                    {
+                        puntos.puntos++;
+                        _context.Entry(puntos).State = EntityState.Modified;
+                    }
+                }
+            }
+
+
+            await _context.SaveChangesAsync();
             return NoContent();
+        }
+
+        [HttpGet("estadisticasPartido/{id}")]
+        [ProducesResponseType(typeof(Partido), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> estadisticasPartido(int id)
+        {
+            var partidos =  _context.Partidos.Include(p => p.predicciones);
+            if (partidos == null) return BadRequest("No hay partidos  en la lista");
+            Partido partido = new Partido();
+            foreach(var aux in partidos){ 
+                if(aux.id == id)
+                {
+                    partido = aux;
+                    break;
+                }
+            }
+            int visitante = 0;
+            int local = 0;
+            int empate = 0;
+
+            foreach(var aux2 in partido.predicciones)
+            {
+                if(aux2.tipo_Resultado == Tipo_Resultado.Local)
+                {
+                    local++;
+                }
+                if (aux2.tipo_Resultado == Tipo_Resultado.Visitante)
+                {
+                    visitante++;
+                }
+                if (aux2.tipo_Resultado == Tipo_Resultado.Empate)
+                {
+                    empate++;
+                }
+            }
+            DtEstadisticas dtE = new DtEstadisticas();
+            dtE.local = local;
+            dtE.visitante = visitante;
+            dtE.empate = empate;
+
+            return Ok(dtE);
         }
     }
 }

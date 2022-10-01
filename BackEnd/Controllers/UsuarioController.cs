@@ -234,7 +234,6 @@ namespace BackEnd.Controllers
                 }
             }
 
-
             if (usuario.predicciones == null)
             {
                 usuario.predicciones = new List<Prediccion>();
@@ -415,6 +414,19 @@ namespace BackEnd.Controllers
             }
             List<Mensaje> mensajes = chatAux.mensajes;
             return Ok(chatAux.mensajes);
+        }
+
+        [HttpPut("depositarBilleteraUsuario/{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> depositarBilleteraUsuario(int id,[FromBody] int monto)
+        {
+            var usuario = await _context.Usuario.FindAsync(id);
+            if (usuario == null) return BadRequest("El usuario no existe");
+            usuario.agregarFondos(monto);
+            _context.Entry(usuario).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return Ok(usuario);
         }
     }
 }
