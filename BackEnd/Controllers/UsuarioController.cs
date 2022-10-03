@@ -41,6 +41,9 @@ namespace BackEnd.Controllers
         public async Task<IActionResult> login(DtLogin dtLogin)
         {
             DbSet<Usuario> users = _context.Usuario;
+            DbSet<Empresa> empresa = _context.Empresas;
+            DbSet<Administrador> administrador = _context.Administradores;
+            DbSet<SuperAdmin> superadmin = _context.SuperAdmins;
             foreach (var aux in users)
             {
                 if (aux.email == dtLogin.email)
@@ -55,13 +58,57 @@ namespace BackEnd.Controllers
                         dtUsuario.billetera = aux.billetera;
 
                         return aux == null ? NotFound() : Ok(dtUsuario);
-                    }
-                    else
-                    {
-                        return BadRequest();
-                    }
-                        
+                    }    
                 }    
+            }
+            foreach (var aux in empresa)
+            {
+                if (aux.email == dtLogin.email)
+                {
+                    if (aux.pass == dtLogin.password)
+                    {
+                        DtEmpresa dtEmpresa = new DtEmpresa();
+                        dtEmpresa.Id = aux.id;
+                        dtEmpresa.Name = aux.nombre;
+                        dtEmpresa.Billetera = aux.billetera;
+                        dtEmpresa.Email = aux.email;
+                        dtEmpresa.tipo_rol = aux.tipoRol;
+                        return aux == null ? NotFound() : Ok(dtEmpresa);
+                    }
+                }
+            }
+            foreach (var aux in administrador)
+            {
+                if (aux.email == dtLogin.email)
+                {
+                    if (aux.password == dtLogin.password)
+                    {
+                        DtAdmin dtAdmin = new DtAdmin();
+                        dtAdmin.Id = aux.Id;
+                        dtAdmin.Name = aux.nombre;
+                        dtAdmin.Email = aux.email;
+                        dtAdmin.Billetera = aux.billetera;
+                        dtAdmin.tipo_rol = aux.Tipo_Rol;
+                        return aux == null ? NotFound() : Ok(dtAdmin);
+                    }
+                }
+            }
+            foreach (var aux in superadmin)
+            {
+                if (aux.email == dtLogin.email)
+                {
+                    if (aux.password == dtLogin.password)
+                    {
+                        DtSuperAdmin dtSAdmin = new DtSuperAdmin();
+                        dtSAdmin.Id = aux.Id;
+                        dtSAdmin.Name = aux.nombre;
+                        dtSAdmin.Email = aux.email;
+                        dtSAdmin.Economia = aux.economia;
+                        dtSAdmin.tipo_rol = aux.Tipo_Rol;
+
+                        return aux == null ? NotFound() : Ok(dtSAdmin);
+                    }
+                }
             }
             return BadRequest();
         }
