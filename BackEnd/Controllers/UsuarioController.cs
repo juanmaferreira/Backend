@@ -295,9 +295,11 @@ namespace BackEnd.Controllers
             var usuario = await _context.Usuario.FindAsync(dtA.idUsuario);
             var penca = await _context.Pencas.FindAsync(dtA.idPenca);
             var competencia = await _context.Competencias.FindAsync(dtA.idCompetencia);
+            var participante = await _context.Participantes.FindAsync(dtA.idParticipante);
             if (penca == null) return BadRequest("No existe la penca");
             if (competencia == null) return BadRequest("No existe la competencia");
             if (usuario == null) return BadRequest("No existe el usuario");
+            if (participante == null) return BadRequest("No existe el participante");
 
             Apuesta apuesta = new Apuesta();
             apuesta.idGanador = dtA.idParticipante;
