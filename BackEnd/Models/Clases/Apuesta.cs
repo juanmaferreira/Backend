@@ -2,7 +2,7 @@
 {
     public class Apuesta
     {
-        public string id { get; set; }
+        public int id { get; set; }
         public Competencia competencia { get; set; }
         public Usuario usuario { get; set; }
 

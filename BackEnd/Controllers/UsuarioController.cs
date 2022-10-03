@@ -108,10 +108,12 @@ namespace BackEnd.Controllers
 
                         return aux == null ? NotFound() : Ok(dtSAdmin);
                     }
-                }
+                       
+                }    
             }
-            return BadRequest();
+            return BadRequest("No existe el usuario en el sistema");
         }
+                    
 
         [HttpPost("Registro")]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -201,8 +203,8 @@ namespace BackEnd.Controllers
             if (penca == null) return BadRequest("No existe la penca");
             if (usuario == null) return BadRequest("No existe el usuario");
 
-            /* if (usuario.billetera < penca.entrada) return BadRequest("El usuario no tiene saldo suficiente");
-             usuario.billetera -= penca.entrada;*/
+            if (usuario.billetera < penca.entrada) return BadRequest("El usuario no tiene saldo suficiente");
+             usuario.billetera -= penca.entrada;
 
             Puntuacion puntuacion = new Puntuacion();
             puntuacion.penca = penca;
@@ -336,6 +338,78 @@ namespace BackEnd.Controllers
                 }
             }
             return Ok(dtPencas);
+        }
+
+        [HttpPost("apostarUnaCompetencia")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> apostarUnaCompetencia(DtApuesta dtA)
+        {
+            var usuario = await _context.Usuario.FindAsync(dtA.idUsuario);
+            var penca = await _context.Pencas.FindAsync(dtA.idPenca);
+            var competencia = await _context.Competencias.FindAsync(dtA.idCompetencia);
+            var participante = await _context.Participantes.FindAsync(dtA.idParticipante);
+            if (penca == null) return BadRequest("No existe la penca");
+            if (competencia == null) return BadRequest("No existe la competencia");
+            if (usuario == null) return BadRequest("No existe el usuario");
+            if (participante == null) return BadRequest("No existe el participante");
+
+            Apuesta apuesta = new Apuesta();
+            apuesta.idGanador = dtA.idParticipante;
+            apuesta.usuario = usuario;
+            apuesta.competencia = competencia;
+
+            Usuario user = new Usuario();
+            Penca penca2 = new Penca();
+
+            var usuarios = _context.Usuario.Include(e => e.puntos_por_penca);
+            var pencas = _context.Pencas.Include(e => e.participantes_puntos);
+            foreach (var aux in usuarios)
+            {
+                if (aux.id == dtA.idUsuario)
+                {
+                    user = aux;
+                    break;
+                }
+            }
+            foreach (var aux in pencas)
+            {
+                if (aux.id == dtA.idPenca)
+                {
+                    penca2 = aux;
+                    break;
+                }
+            }
+
+            foreach (var u in user.puntos_por_penca)
+            {
+                foreach (var p in penca2.participantes_puntos)
+                {
+                    if (u.id == p.id)
+                    {
+                        apuesta.idPuntuacionUsuario = p.id;
+                        break;
+                    }
+                }
+            }
+
+            if (usuario.apuestas == null)
+            {
+                usuario.apuestas = new List<Apuesta>();
+            }
+            usuario.apuestas.Add(apuesta);
+
+            if (competencia.apuestas == null)
+            {
+                competencia.apuestas = new List<Apuesta>();
+            }
+            competencia.apuestas.Add(apuesta);
+
+            _context.Entry(usuario).State = EntityState.Modified;
+            _context.Entry(competencia).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
         [HttpPost("comentarEnForo")]
