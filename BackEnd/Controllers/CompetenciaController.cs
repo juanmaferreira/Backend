@@ -175,9 +175,51 @@ namespace BackEnd.Controllers
                 competenciaaux.posiciones.Add(nombre);
                 //nombreList.Add(nombre);
             }
-            
+
 
             _context.Entry(competenciaaux).State = EntityState.Modified;
+
+            var competenciPuntos =  _context.Competencias.Include(a => a.apuestas);
+            foreach (var item in competenciPuntos)
+            {
+                if (item.Id == id)
+                {
+                    competencia2 = item;
+                    break;
+                }
+            }
+
+            foreach (var item in competencia2.apuestas)
+            {
+                var participante = await _context.Participantes.FindAsync(item.idGanador);
+                if (participante.nombre == competenciaaux.posiciones.ElementAt(0).nombre)
+                {
+                    var puntos = await _context.Puntuaciones.FindAsync(item.idPuntuacionUsuario);
+                    if (puntos != null)
+                    {
+                        puntos.puntos+=5;
+                        _context.Entry(puntos).State = EntityState.Modified;
+                    }
+                }
+                if (participante.nombre == competenciaaux.posiciones.ElementAt(1).nombre)
+                {
+                    var puntos = await _context.Puntuaciones.FindAsync(item.idPuntuacionUsuario);
+                    if (puntos != null)
+                    {
+                        puntos.puntos += 3;
+                        _context.Entry(puntos).State = EntityState.Modified;
+                    }
+                }
+                if (participante.nombre == competenciaaux.posiciones.ElementAt(2).nombre)
+                {
+                    var puntos = await _context.Puntuaciones.FindAsync(item.idPuntuacionUsuario);
+                    if (puntos != null)
+                    {
+                        puntos.puntos += 1;
+                        _context.Entry(puntos).State = EntityState.Modified;
+                    }
+                }
+            }
 
             await _context.SaveChangesAsync();
 

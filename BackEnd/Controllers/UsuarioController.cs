@@ -41,6 +41,9 @@ namespace BackEnd.Controllers
         public async Task<IActionResult> login(DtLogin dtLogin)
         {
             DbSet<Usuario> users = _context.Usuario;
+            DbSet<Empresa> empresa = _context.Empresas;
+            DbSet<Administrador> administrador = _context.Administradores;
+            DbSet<SuperAdmin> superadmin = _context.SuperAdmins;
             foreach (var aux in users)
             {
                 if (aux.email == dtLogin.email)
@@ -55,12 +58,62 @@ namespace BackEnd.Controllers
                         dtUsuario.billetera = aux.billetera;
 
                         return aux == null ? NotFound() : Ok(dtUsuario);
+                    }    
+                }    
+            }
+            foreach (var aux in empresa)
+            {
+                if (aux.email == dtLogin.email)
+                {
+                    if (aux.pass == dtLogin.password)
+                    {
+                        DtEmpresa dtEmpresa = new DtEmpresa();
+                        dtEmpresa.Id = aux.id;
+                        dtEmpresa.Name = aux.nombre;
+                        dtEmpresa.Billetera = aux.billetera;
+                        dtEmpresa.Email = aux.email;
+                        dtEmpresa.tipo_rol = aux.tipoRol;
+                        return aux == null ? NotFound() : Ok(dtEmpresa);
+                    }
+                }
+            }
+            foreach (var aux in administrador)
+            {
+                if (aux.email == dtLogin.email)
+                {
+                    if (aux.password == dtLogin.password)
+                    {
+                        DtAdmin dtAdmin = new DtAdmin();
+                        dtAdmin.Id = aux.Id;
+                        dtAdmin.Name = aux.nombre;
+                        dtAdmin.Email = aux.email;
+                        dtAdmin.Billetera = aux.billetera;
+                        dtAdmin.tipo_rol = aux.Tipo_Rol;
+                        return aux == null ? NotFound() : Ok(dtAdmin);
+                    }
+                }
+            }
+            foreach (var aux in superadmin)
+            {
+                if (aux.email == dtLogin.email)
+                {
+                    if (aux.password == dtLogin.password)
+                    {
+                        DtSuperAdmin dtSAdmin = new DtSuperAdmin();
+                        dtSAdmin.Id = aux.Id;
+                        dtSAdmin.Name = aux.nombre;
+                        dtSAdmin.Email = aux.email;
+                        dtSAdmin.Economia = aux.economia;
+                        dtSAdmin.tipo_rol = aux.Tipo_Rol;
+
+                        return aux == null ? NotFound() : Ok(dtSAdmin);
                     }
                        
                 }    
             }
             return BadRequest("No existe el usuario en el sistema");
         }
+                    
 
         [HttpPost("Registro")]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -295,9 +348,11 @@ namespace BackEnd.Controllers
             var usuario = await _context.Usuario.FindAsync(dtA.idUsuario);
             var penca = await _context.Pencas.FindAsync(dtA.idPenca);
             var competencia = await _context.Competencias.FindAsync(dtA.idCompetencia);
+            var participante = await _context.Participantes.FindAsync(dtA.idParticipante);
             if (penca == null) return BadRequest("No existe la penca");
             if (competencia == null) return BadRequest("No existe la competencia");
             if (usuario == null) return BadRequest("No existe el usuario");
+            if (participante == null) return BadRequest("No existe el participante");
 
             Apuesta apuesta = new Apuesta();
             apuesta.idGanador = dtA.idParticipante;
