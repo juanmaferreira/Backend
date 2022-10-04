@@ -552,5 +552,51 @@ namespace BackEnd.Controllers
             await _context.SaveChangesAsync();
             return Ok(usuario);
         }
+
+        [HttpGet("verPrediccionPartido")]
+        [ProducesResponseType(typeof(Prediccion), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> verPrediccionPartido(int id, int idPartido)
+        {
+            var usuario = await _context.Usuario.FindAsync(id);
+            if (usuario == null) return BadRequest("No existe el usuario");
+            var partido = await _context.Partidos.FindAsync(idPartido);
+            if (partido == null) return BadRequest("No existe el partido");
+
+            var predicciones = _context.Predicciones.Include(p => p.partido.predicciones);
+            foreach (var prediccion in predicciones)
+            {
+                if (prediccion.partido.id == partido.id)
+                {
+                    return Ok(prediccion.tipo_Resultado);
+                }
+            }
+            return NotFound("No se realizo una prediccion sobre este partido");
+        }
+
+        [HttpGet("verPrediccionCompetencia")]
+        [ProducesResponseType(typeof(Prediccion), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> verPrediccionCompetencia(int id, int idCompetencia)
+        {
+            var usuario = await _context.Usuario.FindAsync(id);
+            if (usuario == null) return BadRequest("No existe el usuario");
+            var competencia = await _context.Competencias.FindAsync(id);
+            if (competencia == null) return BadRequest("No existe la competencia");
+
+            var apuestas = _context.Apuestas.Include(a => a.competencia.apuestas);
+            foreach (var apuesta in apuestas)
+            {
+                if (apuesta.competencia.Id == idCompetencia)
+                {
+                    var participante = await _context.Participantes.FindAsync(id);
+                    if (participante == null) return BadRequest("No existe el participante");
+                    return Ok(participante.nombre);
+                }
+            }
+            return NotFound("No se realizo una prediccion sobre esta competencia");
+        }
     }
 }
