@@ -328,7 +328,7 @@ namespace BackEnd.Controllers
             {
                 foreach (var pencas in puntuaciones)
                 {
-                    if (pencas.id == puntos.id)
+                    if (pencas.id == puntos.id && pencas.estado == estado_Penca.Aceptado)
                     {
                         DtPenca dtPenca = new DtPenca();
                         dtPenca.id = pencas.penca.id;
