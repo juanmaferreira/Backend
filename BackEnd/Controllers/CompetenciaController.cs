@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using System.Collections.Generic;
+using System.Net.Mail;
 using System.Runtime.Intrinsics.X86;
 using System.Security.Cryptography.X509Certificates;
 
@@ -217,6 +218,42 @@ namespace BackEnd.Controllers
                     {
                         puntos.puntos += 1;
                         _context.Entry(puntos).State = EntityState.Modified;
+                    }
+                }
+            }
+
+            //enviar correo
+            //var partido3 = _context.Partidos.Include(p => p.predicciones);
+            List<Apuesta> bet = new List<Apuesta>();
+            var apuestasUsuarios = _context.Usuario.Include(u => u.apuestas);
+            foreach (var competenciaAux in competenciPuntos)
+            {
+                if (competenciaAux.Id == id)
+                {
+                    bet = competenciaAux.apuestas;
+                }
+            }
+
+            foreach (var usuarioAux in apuestasUsuarios)
+            {
+                foreach (var ApuestaUsu in usuarioAux.apuestas)
+                {
+                    foreach (var betComp in bet)
+                    {
+                        if (ApuestaUsu.id == betComp.id)
+                        {
+                            string texto = "Saludos " + usuarioAux.nombre + ", le avisamos que la competencia en la que ha apostado finalizó.";
+                            MailMessage mensaje = new MailMessage("penqueapp@gmail.com", usuarioAux.email, "[PenqueApp] Finalizó la competencia esperada.", texto);
+                            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com");
+                            smtpClient.EnableSsl = true;
+                            smtpClient.UseDefaultCredentials = false;
+                            smtpClient.Host = "smtp.gmail.com";
+                            smtpClient.Port = 587;
+                            smtpClient.Credentials = new System.Net.NetworkCredential("penqueapp@gmail.com", "qwknavxpudbjjtfr");
+
+                            smtpClient.Send(mensaje);
+                            smtpClient.Dispose();
+                        }
                     }
                 }
             }
