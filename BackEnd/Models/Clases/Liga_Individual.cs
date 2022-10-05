@@ -1,4 +1,6 @@
-﻿namespace BackEnd.Models.Clases
+﻿using Microsoft.AspNetCore.Server.IIS.Core;
+
+namespace BackEnd.Models.Clases
 {
     public class Liga_Individual
     {

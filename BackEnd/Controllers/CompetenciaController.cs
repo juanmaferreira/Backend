@@ -155,6 +155,10 @@ namespace BackEnd.Controllers
                 {
                     competencia2 = aux;
                     auxList = competencia2.participantes;
+                    if(auxList.Count < 3)
+                    {
+                        return BadRequest("La competencia debe tener al menos 3 competidores.");
+                    }
                     break;
                 }
             }
@@ -165,7 +169,7 @@ namespace BackEnd.Controllers
 
             var competenciaaux = await _context.Competencias.FindAsync(id);
             //Si la competencia no existe
-            if (competenciaaux == null) return BadRequest();
+            if (competenciaaux == null) return BadRequest("La competencia no existe.");
 
             //competenciaaux.posiciones = new List<Nombre>();
             foreach (var aux in randomized)
