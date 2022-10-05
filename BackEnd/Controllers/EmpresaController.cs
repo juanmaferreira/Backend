@@ -219,5 +219,46 @@ namespace BackEnd.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
+        [HttpPost("invitarUsuario")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> invitarUsuario(DtInvitacion dtInvitacion)
+        {
+            var user = _context.Usuario.ToList();
+            var penca = await _context.Pencas.FindAsync(dtInvitacion.idPenca);
+            if (penca == null) return BadRequest("No existe la penca");
+
+            Usuario usr = new Usuario();
+            foreach (var aux in user) {
+
+                if (aux.email == dtInvitacion.emailUsr)
+                {
+                    usr = aux;
+                    Puntuacion puntuacion = new Puntuacion();
+                    puntuacion.penca = penca;
+                    puntuacion.estado = estado_Penca.Invitado;
+                    puntuacion.puntos = 0;
+
+                    if (penca.participantes_puntos == null) {
+                        penca.participantes_puntos = new List<Puntuacion>();
+                    }
+                    
+                    if (usr.puntos_por_penca == null) {
+                        usr.puntos_por_penca = new List<Puntuacion>();
+                    }
+                    penca.participantes_puntos.Add(puntuacion);
+                    usr.puntos_por_penca.Add(puntuacion);
+
+                    _context.Pencas.Add(penca).State = EntityState.Modified;
+                    _context.Usuario.Add(usr).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+
+                    return NoContent();
+                }
+            }
+            return NotFound();
+        }
     }
 }
