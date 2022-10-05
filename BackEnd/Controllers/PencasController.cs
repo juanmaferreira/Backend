@@ -269,7 +269,7 @@ namespace BackEnd.Controllers
             }
             if (li.actualizarEstado()) return BadRequest("La liga aun no ha finalizado");
 
-            penca.chequearEstadoLigaEquipo();
+            penca.chequearEstadoLigaIndividual();
             _context.Entry(penca).State = EntityState.Modified;
             _context.Entry(li).State = EntityState.Modified;
             await _context.SaveChangesAsync();
@@ -277,13 +277,38 @@ namespace BackEnd.Controllers
             return NoContent();
         }
 
-        [HttpGet("PencasCompartidasSegunEstado")]
+        [HttpGet("PencasCompartidasSegunEstado/{id}")]
         [ProducesResponseType(typeof(Penca), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> PencasCompartidasSegunEstado(bool estado)
+        public async Task<IActionResult> PencasCompartidasSegunEstado(int id, bool estado)
         {
-            var pencas = _context.Pencas;
-            List<DtPencasCompartida> listaDePencas = new List<DtPencasCompartida>();
+            var usuarios = _context.Usuario.Include(p => p.puntos_por_penca);
+            Usuario usuario = new Usuario();
+            var puntuaciones = _context.Puntuaciones.Include(p => p.penca);
+
+            foreach(var aux in usuarios)
+            {
+                if(aux.id == id)
+                {
+                    usuario = aux;
+                    break;
+                }
+            }
+
+            List<Penca> auxPencas = new List<Penca>();
+            foreach(var u in usuario.puntos_por_penca)
+            {
+                foreach(var p in puntuaciones)
+                {
+                    if(u.id == p.id)
+                    {
+                        auxPencas.Add(p.penca);
+                    }
+                }
+            }
+
+            var pencas = _context.Pencas.ToList();
+            List <DtPencasCompartida> listaDePencas = new List<DtPencasCompartida>();
             if (pencas != null)
             {
                 foreach (var aux in pencas)
@@ -298,6 +323,17 @@ namespace BackEnd.Controllers
                         listaDePencas.Add(dtP);
                     }
                 }
+                foreach (var auxp in auxPencas)
+                {
+                    foreach(var aux in listaDePencas)
+                    {
+                        if(auxp.id == aux.id)
+                        {
+                            listaDePencas.Remove(aux);
+                        }
+                    }
+                }
+
                 return Ok(listaDePencas);
             }
             return BadRequest("No existe la Penca");
