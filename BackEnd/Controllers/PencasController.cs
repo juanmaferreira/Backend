@@ -4,6 +4,7 @@ using BackEnd.Models.DataTypes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.Intrinsics.X86;
 
 namespace BackEnd.Controllers
 {
@@ -295,20 +296,26 @@ namespace BackEnd.Controllers
                 }
             }
 
-            List<Penca> auxPencas = new List<Penca>();
+            List<DtPencasCompartida> auxPencas = new List<DtPencasCompartida>();
             foreach(var u in usuario.puntos_por_penca)
             {
                 foreach(var p in puntuaciones)
                 {
-                    if(u.id == p.id)
+                    if(u.id == p.id && p.penca.tipo_Penca == Tipo_Penca.Compartida)
                     {
-                        auxPencas.Add(p.penca);
+                        DtPencasCompartida dtP = new DtPencasCompartida();
+                        dtP.id = p.penca.id;
+                        dtP.nombre = p.penca.nombre;
+                        dtP.tipoDeporte = p.penca.tipo_Deporte;
+                        dtP.entrada = p.penca.entrada;
+                        auxPencas.Add(dtP);
                     }
                 }
             }
 
             var pencas = _context.Pencas.ToList();
             List <DtPencasCompartida> listaDePencas = new List<DtPencasCompartida>();
+            List<DtPencasCompartida> listaDePencasx2 = new List<DtPencasCompartida>();
             if (pencas != null)
             {
                 foreach (var aux in pencas)
@@ -323,18 +330,25 @@ namespace BackEnd.Controllers
                         listaDePencas.Add(dtP);
                     }
                 }
-                foreach (var auxp in auxPencas)
+
+                foreach(var aux in listaDePencas)
                 {
-                    foreach(var aux in listaDePencas)
+                    bool encontre = false;
+                    foreach(var dtP in auxPencas)
                     {
-                        if(auxp.id == aux.id)
+                        if(aux.id == dtP.id)
                         {
-                            listaDePencas.Remove(aux);
+                            encontre = true;
+                            break;
                         }
                     }
+                    if (!encontre)
+                    {
+                        listaDePencasx2.Add(aux);
+                    }
                 }
-
-                return Ok(listaDePencas);
+               
+                return Ok(listaDePencasx2);
             }
             return BadRequest("No existe la Penca");
         }
