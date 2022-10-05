@@ -352,5 +352,45 @@ namespace BackEnd.Controllers
             }
             return BadRequest("No existe la Penca");
         }
+        
+        [HttpGet("ListarPosiciones/{id}")]
+        [ProducesResponseType(typeof(Penca), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ListarPosiciones(int id)
+        {
+            var pencas = _context.Pencas.Include(pencas => pencas.participantes_puntos);
+            List<DtPuntaje>posiciones = new List<DtPuntaje>();
+            foreach (var aux in pencas)
+            {
+                if (aux.id == id)
+                {
+                    foreach (var puntuacion in aux.participantes_puntos)
+                    {
+                        var posicion = new DtPuntaje();
+                        posicion.idPuntuacion = puntuacion.id;
+                        posicion.puntaje = puntuacion.puntos;
+                        posiciones.Add(posicion);
+                    }    
+                }
+            }
+            posiciones.Sort((x, y) => x.puntaje.CompareTo(y.puntaje));
+            posiciones.Reverse();
+
+            var usuarios = _context.Usuario.Include(usuarios => usuarios.puntos_por_penca);
+            foreach (var usuario in usuarios)
+            {
+                foreach (var posicion in posiciones)
+                { 
+                    foreach (var puntuacion in usuario.puntos_por_penca)
+                    {
+                        if (puntuacion.id == posicion.idPuntuacion)
+                        {
+                            posicion.usuario = usuario.nombre;
+                        }
+                    }                       
+                }
+            }
+            return Ok(posiciones);
+        }
     }
 }

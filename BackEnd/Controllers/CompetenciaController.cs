@@ -155,6 +155,10 @@ namespace BackEnd.Controllers
                 {
                     competencia2 = aux;
                     auxList = competencia2.participantes;
+                    if(auxList.Count < 3)
+                    {
+                        return BadRequest("La competencia debe tener al menos 3 competidores.");
+                    }
                     break;
                 }
             }
@@ -165,7 +169,7 @@ namespace BackEnd.Controllers
 
             var competenciaaux = await _context.Competencias.FindAsync(id);
             //Si la competencia no existe
-            if (competenciaaux == null) return BadRequest();
+            if (competenciaaux == null) return BadRequest("La competencia no existe.");
 
             //competenciaaux.posiciones = new List<Nombre>();
             foreach (var aux in randomized)
@@ -294,6 +298,35 @@ namespace BackEnd.Controllers
 
 
             return Ok(dtPart);
+        }
+
+        [HttpGet("mostrarParticipantesHabilitados/{id}")]
+        [ProducesResponseType(typeof(Competencia), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> mostrarParticipantesHabilitados(int id)
+        {
+            var competencias = _context.Competencias.Include(e => e.participantes);
+            if (competencias == null) return BadRequest("No existe la competencia");
+            List<Participante> habilitados = new List<Participante>();
+            var participantes = _context.Participantes.ToList();
+            foreach (var competencia in competencias)
+            {
+                if (competencia.Id == id)
+                {           
+                    foreach (var participante in participantes) 
+                    {
+                        //foreach (var competidor in competencia.participantes)
+                        //{
+                            if (!competencia.participantes.Contains(participante))
+                            {
+                                habilitados.Add(participante);
+                            }
+                        //}
+                    }
+                    return Ok(habilitados);
+                }
+            }
+            return BadRequest();
         }
     }
 }
