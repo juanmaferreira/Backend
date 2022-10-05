@@ -258,5 +258,34 @@ namespace BackEnd.Controllers
 
             return Ok(dtPart);
         }
+
+        [HttpGet("mostrarParticipantesHabilitados/{id}")]
+        [ProducesResponseType(typeof(Competencia), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> mostrarParticipantesHabilitados(int id)
+        {
+            var competencias = _context.Competencias.Include(e => e.participantes);
+            if (competencias == null) return BadRequest("No existe la competencia");
+            List<Participante> habilitados = new List<Participante>();
+            var participantes = _context.Participantes.ToList();
+            foreach (var competencia in competencias)
+            {
+                if (competencia.Id == id)
+                {           
+                    foreach (var participante in participantes) 
+                    {
+                        //foreach (var competidor in competencia.participantes)
+                        //{
+                            if (!competencia.participantes.Contains(participante))
+                            {
+                                habilitados.Add(participante);
+                            }
+                        //}
+                    }
+                    return Ok(habilitados);
+                }
+            }
+            return BadRequest();
+        }
     }
 }
