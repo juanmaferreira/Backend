@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Net.Mail;
 
 namespace BackEnd.Controllers
 {
@@ -218,6 +219,86 @@ namespace BackEnd.Controllers
             _context.Entry(empresa).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return NoContent();
+        }
+
+        [HttpPost("invitarUsuario")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> invitarUsuario(DtInvitacion dtInvitacion)
+        {
+            var user = _context.Usuario.ToList();
+            var penca = await _context.Pencas.FindAsync(dtInvitacion.idPenca);
+            if (penca == null) return BadRequest("No existe la penca");
+            var empresaPenca = _context.Empresas.Include(e => e.pencas_empresa);
+            bool empresa = false;
+            bool p = false;
+            string nombreEmpresa = null;
+            foreach(var aux in empresaPenca)
+            {
+                if(aux.id == dtInvitacion.idEmpresa)
+                {
+                    nombreEmpresa = aux.nombre;
+                    empresa = true;
+                    foreach(var aux2 in aux.pencas_empresa)
+                    {
+                        if(aux2.id == dtInvitacion.idPenca)
+                        {
+                            p = true;
+                        }
+                    }
+                }
+            }
+            if (!empresa)
+            {
+                return BadRequest("No existe la empresa.");
+            }
+            if (!p)
+            {
+                return BadRequest("La Penca no está asociada a la empresa.");
+            }
+
+            Usuario usr = new Usuario();
+            foreach (var aux in user) {
+
+                if (aux.email == dtInvitacion.emailUsr)
+                {
+                    usr = aux;
+                    Puntuacion puntuacion = new Puntuacion();
+                    puntuacion.penca = penca;
+                    puntuacion.estado = estado_Penca.Invitado;
+                    puntuacion.puntos = 0;
+
+                    string texto = "Saludos " + usr.nombre + ", le informamos que la empresa " + nombreEmpresa + " lo/la ha invitado a formar parte de una penca.";
+                    MailMessage mensaje = new MailMessage("penqueapp@gmail.com", dtInvitacion.emailUsr, "[PenqueApp] Ha sido invitado a una penca.", texto);
+                    SmtpClient smtpClient = new SmtpClient("smtp.gmail.com");
+                    smtpClient.EnableSsl = true;
+                    smtpClient.UseDefaultCredentials = false;
+                    smtpClient.Host = "smtp.gmail.com";
+                    smtpClient.Port = 587;
+                    smtpClient.Credentials = new System.Net.NetworkCredential("penqueapp@gmail.com", "qwknavxpudbjjtfr");
+
+                    smtpClient.Send(mensaje);
+                    smtpClient.Dispose();
+
+                    if (penca.participantes_puntos == null) {
+                        penca.participantes_puntos = new List<Puntuacion>();
+                    }
+                    
+                    if (usr.puntos_por_penca == null) {
+                        usr.puntos_por_penca = new List<Puntuacion>();
+                    }
+                    penca.participantes_puntos.Add(puntuacion);
+                    usr.puntos_por_penca.Add(puntuacion);
+
+                    _context.Pencas.Add(penca).State = EntityState.Modified;
+                    _context.Usuario.Add(usr).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+
+                    return NoContent();
+                }
+            }
+            return NotFound();
         }
     }
 }

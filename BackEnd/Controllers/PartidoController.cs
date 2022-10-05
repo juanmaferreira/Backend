@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Routing;
+using System.Net.Mail;
 
 namespace BackEnd.Controllers
 {
@@ -163,6 +164,41 @@ namespace BackEnd.Controllers
                 }
             }
 
+            //enviar correo
+            //var partido3 = _context.Partidos.Include(p => p.predicciones);
+            List<Prediccion> prediccions = new List<Prediccion>();
+            var prediccionesUsuarios = _context.Usuario.Include(u => u.predicciones);
+            foreach (var partidoAux in partido3)
+            {
+                if(partidoAux.id == id)
+                {
+                    prediccions = partidoAux.predicciones;
+                }
+            }
+
+            foreach (var usuarioAux in prediccionesUsuarios)
+            {
+                foreach (var prediccionUsu in usuarioAux.predicciones)
+                {
+                    foreach(var prediccionPart in prediccions)
+                    {
+                        if(prediccionUsu.Id == prediccionPart.Id)
+                        {
+                            string texto = "Saludos " + usuarioAux.nombre + ", le avisamos que un partido en el que ha apostado finalizó.";
+                            MailMessage mensaje = new MailMessage("penqueapp@gmail.com", usuarioAux.email, "[PenqueApp] Finalizó el Partido esperado", texto);
+                            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com");
+                            smtpClient.EnableSsl = true;
+                            smtpClient.UseDefaultCredentials = false;
+                            smtpClient.Host = "smtp.gmail.com";
+                            smtpClient.Port = 587;
+                            smtpClient.Credentials = new System.Net.NetworkCredential("penqueapp@gmail.com", "qwknavxpudbjjtfr");
+
+                            smtpClient.Send(mensaje);
+                            smtpClient.Dispose();
+                        }
+                    }
+                }
+            }
 
             await _context.SaveChangesAsync();
             return NoContent();
