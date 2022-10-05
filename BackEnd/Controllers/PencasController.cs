@@ -4,6 +4,7 @@ using BackEnd.Models.DataTypes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.Intrinsics.X86;
 
 namespace BackEnd.Controllers
 {
@@ -295,20 +296,26 @@ namespace BackEnd.Controllers
                 }
             }
 
-            List<Penca> auxPencas = new List<Penca>();
+            List<DtPencasCompartida> auxPencas = new List<DtPencasCompartida>();
             foreach(var u in usuario.puntos_por_penca)
             {
                 foreach(var p in puntuaciones)
                 {
-                    if(u.id == p.id)
+                    if(u.id == p.id && p.penca.tipo_Penca == Tipo_Penca.Compartida)
                     {
-                        auxPencas.Add(p.penca);
+                        DtPencasCompartida dtP = new DtPencasCompartida();
+                        dtP.id = p.penca.id;
+                        dtP.nombre = p.penca.nombre;
+                        dtP.tipoDeporte = p.penca.tipo_Deporte;
+                        dtP.entrada = p.penca.entrada;
+                        auxPencas.Add(dtP);
                     }
                 }
             }
 
             var pencas = _context.Pencas.ToList();
             List <DtPencasCompartida> listaDePencas = new List<DtPencasCompartida>();
+            List<DtPencasCompartida> listaDePencasx2 = new List<DtPencasCompartida>();
             if (pencas != null)
             {
                 foreach (var aux in pencas)
@@ -323,20 +330,67 @@ namespace BackEnd.Controllers
                         listaDePencas.Add(dtP);
                     }
                 }
-                foreach (var auxp in auxPencas)
+
+                foreach(var aux in listaDePencas)
                 {
-                    foreach(var aux in listaDePencas)
+                    bool encontre = false;
+                    foreach(var dtP in auxPencas)
                     {
-                        if(auxp.id == aux.id)
+                        if(aux.id == dtP.id)
                         {
-                            listaDePencas.Remove(aux);
+                            encontre = true;
+                            break;
                         }
                     }
+                    if (!encontre)
+                    {
+                        listaDePencasx2.Add(aux);
+                    }
                 }
-
-                return Ok(listaDePencas);
+               
+                return Ok(listaDePencasx2);
             }
             return BadRequest("No existe la Penca");
+        }
+        
+        [HttpGet("ListarPosiciones/{id}")]
+        [ProducesResponseType(typeof(Penca), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ListarPosiciones(int id)
+        {
+            var pencas = _context.Pencas.Include(pencas => pencas.participantes_puntos);
+            List<DtPuntaje>posiciones = new List<DtPuntaje>();
+            foreach (var aux in pencas)
+            {
+                if (aux.id == id)
+                {
+                    foreach (var puntuacion in aux.participantes_puntos)
+                    {
+                        var posicion = new DtPuntaje();
+                        posicion.idPuntuacion = puntuacion.id;
+                        posicion.puntaje = puntuacion.puntos;
+                        posiciones.Add(posicion);
+                    }    
+                }
+            }
+            posiciones.Sort((x, y) => x.puntaje.CompareTo(y.puntaje));
+            posiciones.Reverse();
+
+            var usuarios = _context.Usuario.Include(usuarios => usuarios.puntos_por_penca);
+            foreach (var usuario in usuarios)
+            {
+                foreach (var posicion in posiciones)
+                { 
+                    foreach (var puntuacion in usuario.puntos_por_penca)
+                    {
+                        if (puntuacion.id == posicion.idPuntuacion)
+                        {
+                            posicion.usuario = usuario.nombre;
+                        }
+                    }                       
+                }
+            }
+            return Ok(posiciones);
         }
     }
 }
