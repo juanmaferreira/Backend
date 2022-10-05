@@ -598,5 +598,46 @@ namespace BackEnd.Controllers
             }
             return NotFound("No se realizo una prediccion sobre esta competencia");
         }
+
+        [HttpGet("invitacionesPenca/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> listarInvitacionesPenca(int id) {
+
+            List<DtPenca> dtPencas = new List<DtPenca>();
+            Usuario user = new Usuario();
+
+            var usuarios = _context.Usuario.Include(e => e.puntos_por_penca);
+            var puntuaciones = _context.Puntuaciones.Include(e => e.penca);
+            var estaUsr = false;
+            foreach (var aux in usuarios)
+            {
+                if (aux.id == id)
+                {
+                    user = aux;
+                    estaUsr = true;
+                    break;
+                } 
+            }
+            if (estaUsr == false) return BadRequest("El usuario no tiene invitaciones pendientes o no existe");
+
+            foreach (var puntos in user.puntos_por_penca)
+            {
+                foreach (var pencas in puntuaciones)
+                {
+                    if (pencas.id == puntos.id && pencas.estado == estado_Penca.Invitado)
+                        {
+                            DtPenca dtPenca = new DtPenca();
+                            dtPenca.id = pencas.penca.id;
+                            dtPenca.nombre = pencas.penca.nombre;
+                            dtPenca.tipo_Deporte = pencas.penca.tipo_Deporte;
+                            dtPenca.fecha_Creacion = pencas.penca.fecha_Creacion;
+                            dtPencas.Add(dtPenca);
+                        }
+                }
+            }
+            return Ok(dtPencas);
+        }
     }
 }
