@@ -9,7 +9,7 @@
 
         public string nombre { get; set; }
 
-        public float billetera { get; set; }
+        public float? billetera { get; set; }
 
         public Tipo_Rol Tipo_Rol { get; set; }
 
