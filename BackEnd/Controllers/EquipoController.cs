@@ -37,6 +37,12 @@ namespace BackEnd.Controllers
         {
             Equipo team = new Equipo();
             team.nombreEquipo = equipo.Name;
+
+            var equipos = _context.Equipos.ToList();
+            foreach(var e in equipos)
+            {
+                if (e.nombreEquipo == team.nombreEquipo) return BadRequest("Ya existe un equipo con ese nombre");
+            }
             
             await _context.Equipos.AddAsync(team);
             await _context.SaveChangesAsync();
