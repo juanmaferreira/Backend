@@ -259,6 +259,24 @@ namespace BackEnd.Controllers
             if (penca == null) return BadRequest("No existe la penca");
 
             var ligasI = _context.Liga_Individuales.Include(c => c.competencias);
+            var ligaIAux = _context.Competencias.Include(c => c.posiciones);
+            List<Competencia> competenciaList = new List<Competencia>();
+            foreach (var aux in ligasI)
+            {
+                if (aux.Id == id)
+                {
+                    foreach (var ligaCompetencias in aux.competencias)
+                    {
+                        foreach (var ligaPosiciones in ligaIAux)
+                        {
+                            if (ligaCompetencias.Id == ligaPosiciones.Id)
+                            {
+                                competenciaList.Add(ligaPosiciones);
+                            }
+                        }
+                    }
+                }
+            }
             Liga_Individual li = new Liga_Individual();
             foreach (var aux in ligasI)
             {
@@ -268,7 +286,7 @@ namespace BackEnd.Controllers
                     break;
                 }
             }
-            if (li.actualizarEstado()) return BadRequest("La liga aun no ha finalizado");
+            if (li.actualizarEstado(competenciaList)) return BadRequest("La liga aun no ha finalizado");
 
             penca.chequearEstadoLigaIndividual();
             _context.Entry(penca).State = EntityState.Modified;

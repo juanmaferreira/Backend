@@ -131,8 +131,10 @@ namespace BackEnd.Controllers
         {
             var liga = await _context.Liga_Individuales.FindAsync(id);
             if (liga == null) return BadRequest("No existe la Liga Individual");
-            var ligaI = _context.Liga_Individuales.Include(li => li.competencias);
-            foreach(var aux in ligaI)
+            var ligaI = _context.Liga_Individuales.Include(li => li.competencias).ToList();
+            var CompetenciaIAux = _context.Competencias.Include(c => c.posiciones).ToList();
+            List<Competencia> competenciaList = new List<Competencia>();
+            foreach (var aux in ligaI)
             {
                 if (aux.Id == id)
                 {
@@ -140,9 +142,20 @@ namespace BackEnd.Controllers
                     {
                         return BadRequest("A la liga aún le faltan competencias por asignar.");
                     }
+                    foreach(var ligaCompetencias in aux.competencias)
+                    {
+                        foreach(var compPosiciones in CompetenciaIAux)
+                        {
+                            if(ligaCompetencias.Id == compPosiciones.Id)
+                            {
+                                competenciaList.Add(compPosiciones);
+                            }
+                        }
+                    }
                 }
             }
-            liga.actualizarEstado();
+            if (competenciaList == null) return BadRequest();
+            liga.actualizarEstado(competenciaList);
             _context.Entry(liga).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return NoContent();

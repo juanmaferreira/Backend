@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Server.IIS.Core;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Models.Clases
 {
@@ -20,12 +21,12 @@ namespace BackEnd.Models.Clases
         {
             throw new NotImplementedException();
         }
-        public bool actualizarEstado()
+        public bool actualizarEstado(List<Competencia> listCompetencias)
         {
             this.activa = false;
-            foreach (var competencia in this.competencias)
+            foreach (var competencia in listCompetencias)
             {
-                if (competencia.posiciones == null)
+                if (competencia.posiciones.Count() == 0)
                 {
                     this.activa = true;
                     break;
