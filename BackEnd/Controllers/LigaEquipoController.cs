@@ -4,6 +4,7 @@ using BackEnd.Models.DataTypes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.Intrinsics.X86;
 
 namespace BackEnd.Controllers
 {
@@ -38,6 +39,10 @@ namespace BackEnd.Controllers
             Liga_Equipo ligaE = new Liga_Equipo();
 
             ligaE.nombreLiga = dtLigaEquipo.nombreLiga;
+            if(dtLigaEquipo.tope < 3)
+            {
+                return BadRequest("El tope de la liga debe ser al menos de 3 partidos.");
+            }
             ligaE.topePartidos = dtLigaEquipo.tope;
             ligaE.activa = true;
 
@@ -116,6 +121,11 @@ namespace BackEnd.Controllers
         {
             var liga = await _context.Liga_Equipos.FindAsync(id);
             if (liga == null) return BadRequest("No existe la Liga de Equipos");
+            if(liga.topePartidos != 0)
+            {
+                return BadRequest("A la liga aún le faltan partidos por asignar.");
+            }
+            
             liga.actualizarEstado();
             _context.Entry(liga).State = EntityState.Modified;
             await _context.SaveChangesAsync();

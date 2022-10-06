@@ -209,6 +209,8 @@ namespace BackEnd.Controllers
             if (usuario.billetera < penca.entrada) return BadRequest("El usuario no tiene saldo suficiente");
              usuario.billetera -= penca.entrada;
 
+            if (penca.tipo_Penca != Tipo_Penca.Compartida) return BadRequest("La penca no es de tipo compartida");
+
             Puntuacion puntuacion = new Puntuacion();
             puntuacion.penca = penca;
             puntuacion.estado = estado_Penca.Aceptado;
@@ -638,6 +640,105 @@ namespace BackEnd.Controllers
                 }
             }
             return Ok(dtPencas);
+        [HttpPut("aceptarInvitacion/{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> aceptarInvitacion(int id, int idPenca)
+        {
+            var usuarios =_context.Usuario.Include(p => p.puntos_por_penca);
+            if (usuarios == null) return BadRequest("No hay usuarios");
+            var pencas = _context.Pencas.Include(p => p.participantes_puntos);
+            if (pencas == null) return BadRequest("No hay pencas");
+            Usuario user = new Usuario();
+            Penca penca = new Penca();
+
+            foreach(var up in usuarios)
+            {
+                if(up.id == id)
+                {
+                    user = up;
+                    break;
+                }
+            }
+
+            foreach (var p in pencas)
+            {
+                if (p.id == idPenca)
+                {
+                    penca = p;
+                    break;
+                }
+            }
+
+            foreach(var puntosP in penca.participantes_puntos)
+            {
+                foreach(var puntosU in user.puntos_por_penca)
+                {
+                    if (puntosP.id == puntosU.id)
+                    {
+                        if (puntosU.estado != estado_Penca.Invitado) return BadRequest("La penca ya ha sido actualizada");
+                        if (user.billetera < penca.entrada) return BadRequest("El usuario no tiene saldo suficiente");
+                        user.billetera -= penca.entrada;
+                        puntosU.estado = estado_Penca.Pendiente;
+                        break;
+                    }
+                }
+            }
+
+            _context.Entry(user).State = EntityState.Modified;
+            _context.Entry(penca).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpPut("rechazarInvitacion/{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> rechazarInvitacion(int id, int idPenca)
+        {
+            var usuarios = _context.Usuario.Include(p => p.puntos_por_penca);
+            if (usuarios == null) return BadRequest("No hay usuarios");
+            var pencas = _context.Pencas.Include(p => p.participantes_puntos);
+            if (pencas == null) return BadRequest("No hay pencas");
+            Usuario user = new Usuario();
+            Penca penca = new Penca();
+
+            foreach (var up in usuarios)
+            {
+                if (up.id == id)
+                {
+                    user = up;
+                    break;
+                }
+            }
+
+            foreach (var p in pencas)
+            {
+                if (p.id == idPenca)
+                {
+                    penca = p;
+                    if (penca.tipo_Penca != Tipo_Penca.Empresa) return BadRequest("Esta penca no es de tipo empresa");
+                    break;
+                }
+            }
+
+            foreach (var puntosP in penca.participantes_puntos)
+            {
+                foreach (var puntosU in user.puntos_por_penca)
+                {
+                    if (puntosP.id == puntosU.id)
+                    {
+                        if (puntosU.estado != estado_Penca.Invitado) return BadRequest("La penca ya ha sido actualizada");
+                        puntosU.estado = estado_Penca.Rechazado;
+                        break;
+                    }
+                }
+            }
+
+            _context.Entry(user).State = EntityState.Modified;
+            _context.Entry(penca).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
     }
 }
