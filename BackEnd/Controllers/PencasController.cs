@@ -4,6 +4,7 @@ using BackEnd.Models.DataTypes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Mail;
 using System.Runtime.Intrinsics.X86;
 
 namespace BackEnd.Controllers
@@ -329,6 +330,26 @@ namespace BackEnd.Controllers
                 }
             }
 
+            foreach (var u in usuarios)
+            {
+                foreach (var puntos in u.puntos_por_penca)
+                {
+                    if (penca.participantes_puntos.Contains(puntos))
+                    {
+                        string texto = "Saludos " + u.nombre + ", le avisamos que la penca " + penca.nombre + " en la que ha apostado finalizó.";
+                        MailMessage mensaje = new MailMessage("penqueapp@gmail.com", u.email, "[PenqueApp] Finalizó la competencia esperada.", texto);
+                        SmtpClient smtpClient = new SmtpClient("smtp.gmail.com");
+                        smtpClient.EnableSsl = true;
+                        smtpClient.UseDefaultCredentials = false;
+                        smtpClient.Host = "smtp.gmail.com";
+                        smtpClient.Port = 587;
+                        smtpClient.Credentials = new System.Net.NetworkCredential("penqueapp@gmail.com", "qwknavxpudbjjtfr");
+
+                        smtpClient.Send(mensaje);
+                        smtpClient.Dispose();
+                    }
+                }
+            }
 
             _context.Entry(penca).State = EntityState.Modified;
             _context.Entry(le).State = EntityState.Modified;
@@ -477,6 +498,29 @@ namespace BackEnd.Controllers
                     }
                 }
             }
+           
+            foreach(var u in usuarios)
+            {
+                foreach(var puntos in u.puntos_por_penca)
+                {
+                    if (penca.participantes_puntos.Contains(puntos))
+                    {
+                        string texto = "Saludos " + u.nombre + ", le avisamos que la penca "+ penca.nombre + " en la que ha apostado finalizó.";
+                        MailMessage mensaje = new MailMessage("penqueapp@gmail.com", u.email, "[PenqueApp] Finalizó la competencia esperada.", texto);
+                        SmtpClient smtpClient = new SmtpClient("smtp.gmail.com");
+                        smtpClient.EnableSsl = true;
+                        smtpClient.UseDefaultCredentials = false;
+                        smtpClient.Host = "smtp.gmail.com";
+                        smtpClient.Port = 587;
+                        smtpClient.Credentials = new System.Net.NetworkCredential("penqueapp@gmail.com", "qwknavxpudbjjtfr");
+
+                        smtpClient.Send(mensaje);
+                        smtpClient.Dispose();
+                    }
+                }
+            }
+
+
             _context.Entry(penca).State = EntityState.Modified;
             _context.Entry(li).State = EntityState.Modified;
             await _context.SaveChangesAsync();
