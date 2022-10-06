@@ -37,6 +37,10 @@ namespace BackEnd.Controllers
         {
             Liga_Individual liga = new Liga_Individual();
             liga.Nombre = ligaI.Nombre;
+            if(ligaI.topeCompetencias < 3)
+            {
+                return BadRequest("La liga debe tener al menos 3 competencias.");
+            }
             liga.topeCompetencias = ligaI.topeCompetencias;
             liga.activa = true;
             await _context.Liga_Individuales.AddAsync(liga);
@@ -72,7 +76,7 @@ namespace BackEnd.Controllers
 
             var competencia = await _context.Competencias.FindAsync(idCompetencia);
             
-            if (competencia == null) return BadRequest();
+            if (competencia == null) return BadRequest("No existe la competencia.");
 
             if(comp.Count == 0)
             {
@@ -87,7 +91,7 @@ namespace BackEnd.Controllers
                 await _context.SaveChangesAsync();
                 return NoContent();
             }
-            return BadRequest();
+            return BadRequest("La liga ya está llena.");
         }
 
         [HttpGet("mostrarCompetencias/{id}")]
@@ -127,7 +131,31 @@ namespace BackEnd.Controllers
         {
             var liga = await _context.Liga_Individuales.FindAsync(id);
             if (liga == null) return BadRequest("No existe la Liga Individual");
-            liga.actualizarEstado();
+            var ligaI = _context.Liga_Individuales.Include(li => li.competencias).ToList();
+            var CompetenciaIAux = _context.Competencias.Include(c => c.posiciones).ToList();
+            List<Competencia> competenciaList = new List<Competencia>();
+            foreach (var aux in ligaI)
+            {
+                if (aux.Id == id)
+                {
+                    if(aux.competencias.Count() < liga.topeCompetencias)
+                    {
+                        return BadRequest("A la liga aún le faltan competencias por asignar.");
+                    }
+                    foreach(var ligaCompetencias in aux.competencias)
+                    {
+                        foreach(var compPosiciones in CompetenciaIAux)
+                        {
+                            if(ligaCompetencias.Id == compPosiciones.Id)
+                            {
+                                competenciaList.Add(compPosiciones);
+                            }
+                        }
+                    }
+                }
+            }
+            if (competenciaList == null) return BadRequest();
+            liga.actualizarEstado(competenciaList);
             _context.Entry(liga).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return NoContent();

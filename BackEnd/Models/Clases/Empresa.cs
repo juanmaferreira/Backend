@@ -10,7 +10,7 @@ namespace BackEnd.Models.Clases
         public string email { get; set; }
         public string nombre { get; set; }
         public string pass { get; set; }
-        public float billetera { get; set; }
+        public float? billetera { get; set; }
         public Tipo_Rol tipoRol { get; set; }
 
         public List<Chat> chats { get; set; }

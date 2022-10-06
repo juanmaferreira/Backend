@@ -8,7 +8,7 @@ namespace BackEnd.Models.DataTypes
 
         public string Name { get; set; }
 
-        public float Billetera { get; set; }
+        public float? Billetera { get; set; }
 
         public string Password { get; set; }
 

@@ -3,6 +3,7 @@ using BackEnd.Models.Clases;
 using BackEnd.Models.DataTypes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Controllers
@@ -74,6 +75,90 @@ namespace BackEnd.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(dtSuperAdmin);
+        }
+
+        [HttpPost("meterDatos")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public void meterDatos()
+        {
+            SqlConnection conexion = new SqlConnection("server=DESKTOP-AKJETIH\\SQLEXPRESS ; database=PenqueApp ; integrated security = true");
+            conexion.Open();
+            string cadena = "insert into participantes(nombre,Area) values ('Participante1', 1)";
+            SqlCommand comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into participantes(nombre,Area) values ('Participante2', 1)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into participantes(nombre,Area) values ('Participante3', 1)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into participantes(nombre, Area) values ('Participante4', 1)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into participantes(nombre, Area) values ('Participante5', 2)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into participantes(nombre, Area) values ('Participante6', 2)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into participantes(nombre, Area) values ('Participante7', 2)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into participantes(nombre, Area) values ('Participante8', 3)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into participantes(nombre, Area) values ('Participante9', 3)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into Competencias(Area, fecha_competencia, nombre, ligaI, topeParticipantes, Liga_IndividualId) values (1, '2022-10-06', 'Competencia1', 0, 3, NULL)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into Competencias(Area, fecha_competencia, nombre, ligaI, topeParticipantes, Liga_IndividualId) values (1, '2022-10-06', 'Competencia2', 0, 3, NULL)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into Competencias(Area, fecha_competencia, nombre, ligaI, topeParticipantes, Liga_IndividualId) values (2, '2022-10-06', 'Competencia3', 0, 5, NULL)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into Competencias(Area, fecha_competencia, nombre, ligaI, topeParticipantes, Liga_IndividualId) values (2, '2022-10-06', 'Competencia4', 0, 8, NULL)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into Competencias(Area, fecha_competencia, nombre, ligaI, topeParticipantes, Liga_IndividualId) values (3, '2022-10-06', 'Competencia5', 0, 3, NULL)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into Competencias(Area, fecha_competencia, nombre, ligaI, topeParticipantes, Liga_IndividualId) values (3, '2022-10-06', 'Competencia6', 0, 4, NULL)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into CompetenciaParticipante(competenciasId, participantesId) values (1, 1)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into CompetenciaParticipante(competenciasId, participantesId) values (1, 2)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into CompetenciaParticipante(competenciasId, participantesId) values (1, 3)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into CompetenciaParticipante(competenciasId, participantesId) values (3, 4)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into CompetenciaParticipante(competenciasId, participantesId) values (3, 5)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into Liga_Individuales(Nombre, topeCompetencias, activa) values ('LigaI1', 3, 1)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into Liga_Individuales(Nombre, topeCompetencias, activa) values ('LigaI2', 4, 1)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into Liga_Individuales(Nombre, topeCompetencias, activa) values ('LigaI3', 3, 1)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+            cadena = "insert into Liga_Individuales(Nombre, topeCompetencias, activa) values ('LigaI1', 3, 1)";
+            comando = new SqlCommand(cadena, conexion);
+            comando.ExecuteNonQuery();
+
+
+            conexion.Close();
         }
     }
 }

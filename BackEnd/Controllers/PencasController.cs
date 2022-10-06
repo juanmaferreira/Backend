@@ -234,6 +234,102 @@ namespace BackEnd.Controllers
             if (le.actualizarEstado()) return BadRequest("La liga aun no ha finalizado");
 
             penca.chequearEstadoLigaEquipo();
+
+            var pencasPuntaje = _context.Pencas.Include(p => p.participantes_puntos);
+            foreach (var aux in pencasPuntaje)
+            {
+                if (aux.id == id)
+                {
+                    penca = aux;
+                    break;
+                }
+            }
+            
+            List<Puntuacion> posiciones = new List<Puntuacion>();
+            posiciones = penca.participantes_puntos;
+            posiciones.Sort((x, y) => x.puntos.CompareTo(y.puntos));
+            posiciones.Reverse();
+
+            float? pozo = penca.pozo;
+            float? comicionAdmin = Convert.ToSingle(pozo * 0.3);
+            pozo -= comicionAdmin;
+
+            
+
+            if(penca.tipo_Penca == Tipo_Penca.Compartida) {
+                var Admins = _context.Administradores.Include(p => p.pencas);
+                foreach (var a in Admins)
+                {
+                    if (a.pencas.Contains(penca))
+                    {
+                        a.billetera += comicionAdmin;
+                        break;
+                    }
+                }
+            }
+            if(penca.tipo_Penca == Tipo_Penca.Empresa) {
+                var Empresas = _context.Empresas.Include(p => p.pencas_empresa);
+                foreach (var e in Empresas)
+                {
+                    if (e.pencas_empresa.Contains(penca))
+                    {
+                        e.billetera += comicionAdmin;
+                        break;
+                    }
+                }
+            }
+
+
+            int cantPart = posiciones.Count;
+           
+            var usuarios = _context.Usuario.Include(p => p.puntos_por_penca);
+            foreach(var u in usuarios)
+            {
+                foreach(var puntos in u.puntos_por_penca)
+                {
+                    if (cantPart == 1)
+                    {
+                        if (posiciones.ElementAt(0).id == puntos.id)
+                        {
+                            u.agregarFondos(Convert.ToSingle(pozo));
+                            _context.Entry(u).State = EntityState.Modified;
+                        }
+                    }
+                    if (cantPart == 2)
+                    {
+                        if (posiciones.ElementAt(0).id == puntos.id)
+                        {
+                            u.agregarFondos(Convert.ToSingle(pozo * 0.7));
+                            _context.Entry(u).State = EntityState.Modified;
+                        }
+                        if (posiciones.ElementAt(1).id == puntos.id)
+                        {
+                            u.agregarFondos(Convert.ToSingle(pozo * 0.3));
+                            _context.Entry(u).State = EntityState.Modified;
+                        }
+                    }
+                    if (cantPart >= 3)
+                    {
+                        if (posiciones.ElementAt(0).id == puntos.id)
+                        {
+                            u.agregarFondos(Convert.ToSingle(pozo * 0.5));
+                            _context.Entry(u).State = EntityState.Modified;
+                        }
+                        if (posiciones.ElementAt(1).id == puntos.id)
+                        {
+                            u.agregarFondos(Convert.ToSingle(pozo * 0.3));
+                            _context.Entry(u).State = EntityState.Modified;
+                        }
+                        if (posiciones.ElementAt(2).id == puntos.id)
+                        {
+                            u.agregarFondos(Convert.ToSingle(pozo * 0.2));
+                            _context.Entry(u).State = EntityState.Modified;
+                        }
+                    }
+                }
+            }
+
+
             _context.Entry(penca).State = EntityState.Modified;
             _context.Entry(le).State = EntityState.Modified;
             await _context.SaveChangesAsync();
@@ -259,6 +355,24 @@ namespace BackEnd.Controllers
             if (penca == null) return BadRequest("No existe la penca");
 
             var ligasI = _context.Liga_Individuales.Include(c => c.competencias);
+            var ligaIAux = _context.Competencias.Include(c => c.posiciones);
+            List<Competencia> competenciaList = new List<Competencia>();
+            foreach (var aux in ligasI)
+            {
+                if (aux.Id == id)
+                {
+                    foreach (var ligaCompetencias in aux.competencias)
+                    {
+                        foreach (var ligaPosiciones in ligaIAux)
+                        {
+                            if (ligaCompetencias.Id == ligaPosiciones.Id)
+                            {
+                                competenciaList.Add(ligaPosiciones);
+                            }
+                        }
+                    }
+                }
+            }
             Liga_Individual li = new Liga_Individual();
             foreach (var aux in ligasI)
             {
@@ -268,9 +382,101 @@ namespace BackEnd.Controllers
                     break;
                 }
             }
-            if (li.actualizarEstado()) return BadRequest("La liga aun no ha finalizado");
+            if (li.actualizarEstado(competenciaList)) return BadRequest("La liga aun no ha finalizado");
 
             penca.chequearEstadoLigaIndividual();
+
+            var pencasPuntaje = _context.Pencas.Include(p => p.participantes_puntos);
+            foreach (var aux in pencasPuntaje)
+            {
+                if (aux.id == id)
+                {
+                    penca = aux;
+                    break;
+                }
+            }
+
+            List<Puntuacion> posiciones = new List<Puntuacion>();
+            posiciones = penca.participantes_puntos;
+            posiciones.Sort((x, y) => x.puntos.CompareTo(y.puntos));
+            posiciones.Reverse();
+
+            float? pozo = penca.pozo;
+            float? comicionAdmin = Convert.ToSingle(pozo * 0.3);
+            pozo -= comicionAdmin;
+            if (penca.tipo_Penca == Tipo_Penca.Compartida)
+            {
+                var Admins = _context.Administradores.Include(p => p.pencas);
+                foreach (var a in Admins)
+                {
+                    if (a.pencas.Contains(penca))
+                    {
+                        a.billetera += comicionAdmin;
+                        break;
+                    }
+                }
+            }
+            if (penca.tipo_Penca == Tipo_Penca.Empresa)
+            {
+                var Empresas = _context.Empresas.Include(p => p.pencas_empresa);
+                foreach (var e in Empresas)
+                {
+                    if (e.pencas_empresa.Contains(penca))
+                    {
+                        e.billetera += comicionAdmin;
+                        break;
+                    }
+                }
+            }
+
+            int cantPart = posiciones.Count;
+
+            var usuarios = _context.Usuario.Include(p => p.puntos_por_penca);
+            foreach (var u in usuarios)
+            {
+                foreach (var puntos in u.puntos_por_penca)
+                {
+                    if (cantPart == 1)
+                    {
+                        if (posiciones.ElementAt(0).id == puntos.id)
+                        {
+                            u.agregarFondos(Convert.ToSingle(pozo));
+                            _context.Entry(u).State = EntityState.Modified;
+                        }
+                    }
+                    if (cantPart == 2)
+                    {
+                        if (posiciones.ElementAt(0).id == puntos.id)
+                        {
+                            u.agregarFondos(Convert.ToSingle(pozo * 0.7));
+                            _context.Entry(u).State = EntityState.Modified;
+                        }
+                        if (posiciones.ElementAt(1).id == puntos.id)
+                        {
+                            u.agregarFondos(Convert.ToSingle(pozo * 0.3));
+                            _context.Entry(u).State = EntityState.Modified;
+                        }
+                    }
+                    if (cantPart >= 3)
+                    {
+                        if (posiciones.ElementAt(0).id == puntos.id)
+                        {
+                            u.agregarFondos(Convert.ToSingle(pozo * 0.5));
+                            _context.Entry(u).State = EntityState.Modified;
+                        }
+                        if (posiciones.ElementAt(1).id == puntos.id)
+                        {
+                            u.agregarFondos(Convert.ToSingle(pozo * 0.3));
+                            _context.Entry(u).State = EntityState.Modified;
+                        }
+                        if (posiciones.ElementAt(2).id == puntos.id)
+                        {
+                            u.agregarFondos(Convert.ToSingle(pozo * 0.2));
+                            _context.Entry(u).State = EntityState.Modified;
+                        }
+                    }
+                }
+            }
             _context.Entry(penca).State = EntityState.Modified;
             _context.Entry(li).State = EntityState.Modified;
             await _context.SaveChangesAsync();
