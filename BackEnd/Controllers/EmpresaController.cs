@@ -1,10 +1,8 @@
 ﻿using BackEnd.Data;
 using BackEnd.Models.Clases;
 using BackEnd.Models.DataTypes;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Net.Mail;
 
 namespace BackEnd.Controllers
@@ -20,7 +18,8 @@ namespace BackEnd.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetById(int id) { 
+        public async Task<IActionResult> GetById(int id)
+        {
 
             var empresa = await _context.Empresas.FindAsync(id);
             if (empresa == null) return BadRequest("No existe la empresa");
@@ -45,8 +44,9 @@ namespace BackEnd.Controllers
             DbSet<Empresa> empresas = _context.Empresas;
             DbSet<Administrador> administradores = _context.Administradores;
             DbSet<SuperAdmin> superadmins = _context.SuperAdmins;
-            foreach (var aux in empresas) { 
-                if(aux.email == dtEmpresa.Email) return BadRequest("Ya existe alguien registrada con ese mail");
+            foreach (var aux in empresas)
+            {
+                if (aux.email == dtEmpresa.Email) return BadRequest("Ya existe alguien registrada con ese mail");
             }
 
             foreach (var aux in usuarios)
@@ -85,23 +85,23 @@ namespace BackEnd.Controllers
             List<DtPencaEmpresa> dtequipo = new List<DtPencaEmpresa>();
             Empresa empresa = new Empresa();
             var empresas = _context.Empresas.Include(e => e.pencas_empresa);
-            foreach(var aux in empresas)
+            foreach (var aux in empresas)
             {
-                if(aux.id == id)
+                if (aux.id == id)
                 {
-                    foreach(var aux2 in aux.pencas_empresa)
+                    foreach (var aux2 in aux.pencas_empresa)
                     {
                         DtPencaEmpresa dtPE = new DtPencaEmpresa();
                         dtPE.id = aux2.id;
                         dtPE.nombre = aux2.nombre;
                         dtPE.tipoPlan = aux2.tipo_Plan;
                         dtequipo.Add(dtPE);
-                      
+
                     }
                     return Ok(dtequipo);
                 }
             }
-            return BadRequest();     
+            return BadRequest();
         }
 
         [HttpPut("enviarMensaje")]
@@ -129,7 +129,7 @@ namespace BackEnd.Controllers
             {
                 usuario.chats = new List<Chat>();
             }
-           
+
             Chat chat = new Chat();
             chat.empresa = empresa;
             chat.usuario = usuario;
@@ -234,15 +234,15 @@ namespace BackEnd.Controllers
             bool empresa = false;
             bool p = false;
             string nombreEmpresa = null;
-            foreach(var aux in empresaPenca)
+            foreach (var aux in empresaPenca)
             {
-                if(aux.id == dtInvitacion.idEmpresa)
+                if (aux.id == dtInvitacion.idEmpresa)
                 {
                     nombreEmpresa = aux.nombre;
                     empresa = true;
-                    foreach(var aux2 in aux.pencas_empresa)
+                    foreach (var aux2 in aux.pencas_empresa)
                     {
-                        if(aux2.id == dtInvitacion.idPenca)
+                        if (aux2.id == dtInvitacion.idPenca)
                         {
                             p = true;
                         }
@@ -259,7 +259,8 @@ namespace BackEnd.Controllers
             }
 
             Usuario usr = new Usuario();
-            foreach (var aux in user) {
+            foreach (var aux in user)
+            {
 
                 if (aux.email == dtInvitacion.emailUsr)
                 {
@@ -281,11 +282,13 @@ namespace BackEnd.Controllers
                     smtpClient.Send(mensaje);
                     smtpClient.Dispose();
 
-                    if (penca.participantes_puntos == null) {
+                    if (penca.participantes_puntos == null)
+                    {
                         penca.participantes_puntos = new List<Puntuacion>();
                     }
-                    
-                    if (usr.puntos_por_penca == null) {
+
+                    if (usr.puntos_por_penca == null)
+                    {
                         usr.puntos_por_penca = new List<Puntuacion>();
                     }
                     penca.participantes_puntos.Add(puntuacion);
@@ -299,6 +302,47 @@ namespace BackEnd.Controllers
                 }
             }
             return NotFound();
+        }
+
+        [HttpGet("listarUsuariosAEsperaDeConfirmacion")]
+        [ProducesResponseType(typeof(Usuario), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> listarUsuariosAEsperaDeConfirmacion(int idEmpresa, int idPenca)
+        {
+            var penca = await _context.Pencas.FindAsync(idPenca);
+            if (penca == null) return BadRequest("no existe la penca");
+            var empresas = _context.Empresas.Include(e => e.pencas_empresa).ToList();
+            var puntuaciones = _context.Puntuaciones.Include(p => p.usuario).Include(p => p.penca);
+
+            foreach (var empresa in empresas)
+            {
+                if (empresa.id == idEmpresa)
+                {
+                    if (empresa.pencas_empresa.Contains(penca)) break;
+                    else return BadRequest("la penca no pertenece a esta empresa");
+                }
+            }
+
+            List<DtUsuario> usuariosPendientes = new List<DtUsuario>();
+            foreach (var puntuacion in puntuaciones)
+            {
+                foreach (var empresa in empresas)
+                {
+                    if (puntuacion.penca.id == idPenca)
+                    {
+                        if (puntuacion.estado == estado_Penca.Pendiente)
+                        {
+                            var DtUsuario = new DtUsuario();
+                            DtUsuario.Id = puntuacion.usuario.id;
+                            DtUsuario.email = puntuacion.usuario.email;
+                            DtUsuario.Nombre = puntuacion.usuario.nombre;
+                            usuariosPendientes.Add(DtUsuario);
+                        }
+                        break;
+                    }
+                } 
+            }
+            return Ok(usuariosPendientes);
         }
     }
 }
