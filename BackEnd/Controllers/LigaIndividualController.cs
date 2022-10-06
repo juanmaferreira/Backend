@@ -155,7 +155,9 @@ namespace BackEnd.Controllers
                 }
             }
             if (competenciaList == null) return BadRequest();
-            liga.actualizarEstado(competenciaList);
+            bool exito = liga.actualizarEstado(competenciaList);
+       
+            if (exito) return BadRequest("Todavia hay competencias que no finalizaron");
             _context.Entry(liga).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return NoContent();

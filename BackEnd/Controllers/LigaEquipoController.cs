@@ -119,14 +119,24 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> chequearFinalizada(int id)
         {
-            var liga = await _context.Liga_Equipos.FindAsync(id);
+            var ligas = _context.Liga_Equipos.Include(p => p.partidos);
+            Liga_Equipo liga = new Liga_Equipo();
+            foreach(var l in ligas)
+            {
+                if(l.id == id)
+                {
+                    liga = l;
+                    break;
+                }
+            }
             if (liga == null) return BadRequest("No existe la Liga de Equipos");
             if(liga.topePartidos != 0)
             {
                 return BadRequest("A la liga aún le faltan partidos por asignar.");
             }
             
-            liga.actualizarEstado();
+            bool exito = liga.actualizarEstado();
+            if (exito) return BadRequest("Todavia hay partidos que no finalizaron");
             _context.Entry(liga).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return NoContent();

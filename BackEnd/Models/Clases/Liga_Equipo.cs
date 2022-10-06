@@ -19,10 +19,12 @@ namespace BackEnd.Models.Clases{
         public bool actualizarEstado()
         {
             this.activa = false;
-            foreach (var partido in this.partidos)
+            
+            foreach (var partido in partidos)
             {
+                Console.WriteLine(partido.resultado);
                 if (partido.resultado == Tipo_Resultado.Indefinido)
-                {
+                {  
                     this.activa = true;
                     break;
                 }
