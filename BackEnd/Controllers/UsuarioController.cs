@@ -605,7 +605,8 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> listarInvitacionesPenca(int id) {
+        public async Task<IActionResult> listarInvitacionesPenca(int id)
+        {
 
             List<DtPenca> dtPencas = new List<DtPenca>();
             Usuario user = new Usuario();
@@ -620,7 +621,7 @@ namespace BackEnd.Controllers
                     user = aux;
                     estaUsr = true;
                     break;
-                } 
+                }
             }
             if (estaUsr == false) return BadRequest("El usuario no tiene invitaciones pendientes o no existe");
 
@@ -629,17 +630,20 @@ namespace BackEnd.Controllers
                 foreach (var pencas in puntuaciones)
                 {
                     if (pencas.id == puntos.id && pencas.estado == estado_Penca.Invitado)
-                        {
-                            DtPenca dtPenca = new DtPenca();
-                            dtPenca.id = pencas.penca.id;
-                            dtPenca.nombre = pencas.penca.nombre;
-                            dtPenca.tipo_Deporte = pencas.penca.tipo_Deporte;
-                            dtPenca.fecha_Creacion = pencas.penca.fecha_Creacion;
-                            dtPencas.Add(dtPenca);
-                        }
+                    {
+                        DtPenca dtPenca = new DtPenca();
+                        dtPenca.id = pencas.penca.id;
+                        dtPenca.nombre = pencas.penca.nombre;
+                        dtPenca.tipo_Deporte = pencas.penca.tipo_Deporte;
+                        dtPenca.fecha_Creacion = pencas.penca.fecha_Creacion;
+                        dtPencas.Add(dtPenca);
+                    }
                 }
             }
             return Ok(dtPencas);
+
+        }
+
         [HttpPut("aceptarInvitacion/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
