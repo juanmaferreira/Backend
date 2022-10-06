@@ -315,13 +315,11 @@ namespace BackEnd.Controllers
                 {           
                     foreach (var participante in participantes) 
                     {
-                        //foreach (var competidor in competencia.participantes)
-                        //{
-                            if (!competencia.participantes.Contains(participante))
-                            {
-                                habilitados.Add(participante);
-                            }
-                        //}
+                        if (!competencia.participantes.Contains(participante) && participante.Area == competencia.Area)
+                        { 
+                            habilitados.Add(participante);
+                        }
+
                     }
                     return Ok(habilitados);
                 }
