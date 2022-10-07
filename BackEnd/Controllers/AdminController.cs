@@ -116,13 +116,16 @@ namespace BackEnd.Controllers
 
                     foreach (var aux in a.pencas)
                     {
-                        DtPencasCompartida pencasaCompartidas = new DtPencasCompartida();
-                        pencasaCompartidas.id = aux.id;
-                        pencasaCompartidas.nombre = aux.nombre;
-                        pencasaCompartidas.tipoDeporte = aux.tipo_Deporte;
-                        pencasaCompartidas.entrada = aux.entrada;
-                        pencasaCompartidas.pozo = aux.pozo;
-                        pencasComp.Add(pencasaCompartidas);
+                        if (aux.estado){
+                            DtPencasCompartida pencasaCompartidas = new DtPencasCompartida();
+                            pencasaCompartidas.id = aux.id;
+                            pencasaCompartidas.nombre = aux.nombre;
+                            pencasaCompartidas.tipoDeporte = aux.tipo_Deporte;
+                            pencasaCompartidas.entrada = aux.entrada;
+                            pencasaCompartidas.pozo = aux.pozo;
+                            pencasComp.Add(pencasaCompartidas);
+                        }
+                        
                     }
                     return Ok(pencasComp);
                 }
