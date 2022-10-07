@@ -227,13 +227,23 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> invitarUsuario(DtInvitacion dtInvitacion)
         {
-            var user = _context.Usuario.ToList();
+            var user = _context.Usuario.Include(p => p.puntos_por_penca).ToList();
             var penca = await _context.Pencas.FindAsync(dtInvitacion.idPenca);
+            var pencas = _context.Pencas.Include(p => p.participantes_puntos).ToList();
+            Penca pencaAux = new Penca();
             if (penca == null) return BadRequest("No existe la penca");
             var empresaPenca = _context.Empresas.Include(e => e.pencas_empresa);
             bool empresa = false;
             bool p = false;
             string nombreEmpresa = null;
+            foreach(var aux in pencas)
+            {
+                if(aux.id == dtInvitacion.idPenca)
+                {
+                    pencaAux = aux;
+                    break;
+                }
+            }
             foreach (var aux in empresaPenca)
             {
                 if (aux.id == dtInvitacion.idEmpresa)
@@ -261,9 +271,14 @@ namespace BackEnd.Controllers
             Usuario usr = new Usuario();
             foreach (var aux in user)
             {
+                foreach(var puntos in penca.participantes_puntos)
+                {
+                    if (aux.puntos_por_penca.Contains(puntos)) return BadRequest("El usuario ya ha sido invitado");
+                }
 
                 if (aux.email == dtInvitacion.emailUsr)
                 {
+                    
                     usr = aux;
                     Puntuacion puntuacion = new Puntuacion();
                     puntuacion.penca = penca;
