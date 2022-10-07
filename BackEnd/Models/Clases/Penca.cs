@@ -12,7 +12,9 @@ namespace BackEnd.Models.Clases
     public enum Tipo_Deporte
     {
         Futbol,
-        Basquetball
+        Basquetball,
+        Tenis,
+        Voley
     }
 
     public enum Tipo_Plan
