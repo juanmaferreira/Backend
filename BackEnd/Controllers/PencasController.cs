@@ -69,7 +69,7 @@ namespace BackEnd.Controllers
             Penca penca = new Penca();
 
             penca.nombre = dtPC.nombre;
-            penca.tipo_Deporte = dtPC.tipoDeporte;
+            penca.tipo_Deporte = Tipo_Deporte.Competencia;
             penca.tipo_Penca = Tipo_Penca.Compartida;
             penca.entrada = dtPC.entrada;
             penca.pozo = 0;
@@ -144,7 +144,7 @@ namespace BackEnd.Controllers
             Penca penca = new Penca();
 
             penca.nombre = dtPE.nombre;
-            penca.tipo_Deporte = dtPE.tipoDeporte;
+            penca.tipo_Deporte = Tipo_Deporte.Competencia;
             penca.tipo_Penca = Tipo_Penca.Empresa;
             penca.entrada = dtPE.entrada;
             penca.pozo = dtPE.premioFinal;

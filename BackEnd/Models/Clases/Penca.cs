@@ -14,7 +14,8 @@ namespace BackEnd.Models.Clases
         Futbol,
         Basquetball,
         Tenis,
-        Voley
+        Voley,
+        Competencia
     }
 
     public enum Tipo_Plan
