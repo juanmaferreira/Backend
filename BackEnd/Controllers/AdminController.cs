@@ -123,6 +123,7 @@ namespace BackEnd.Controllers
                             pencasaCompartidas.tipoDeporte = aux.tipo_Deporte;
                             pencasaCompartidas.entrada = aux.entrada;
                             pencasaCompartidas.pozo = aux.pozo;
+                            pencasaCompartidas.Tipo_Liga = aux.tipo_Liga;
                             pencasComp.Add(pencasaCompartidas);
                         }
                         
