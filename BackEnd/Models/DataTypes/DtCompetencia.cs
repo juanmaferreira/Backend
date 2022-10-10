@@ -9,5 +9,7 @@ namespace BackEnd.Models.DataTypes
         public DateTime fecha_competencia { get; set; }
         public string nombre { get; set; }
         public int topeParticipantes { get; set; }
+
+        public bool estado { get; set; }
     }
 }

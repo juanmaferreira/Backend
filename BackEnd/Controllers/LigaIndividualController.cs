@@ -119,6 +119,7 @@ namespace BackEnd.Controllers
                 comp.Area = dt.Area;
                 comp.topeParticipantes = dt.topeParticipantes;
                 comp.fecha_competencia = dt.fecha_competencia;
+                comp.estado = dt.activa;
                 dtcomp.Add(comp);
             }
             return Ok(dtcomp);

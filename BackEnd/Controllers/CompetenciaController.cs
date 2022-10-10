@@ -46,6 +46,7 @@ namespace BackEnd.Controllers
             competencia.Area = dtcompetencia.Area;
             competencia.fecha_competencia = dtcompetencia.fecha_competencia;
             competencia.nombre = dtcompetencia.nombre;
+            competencia.activa = true;
             competencia.ligaI = false;
             //competencia.participantes = new List<Participante>();
             competencia.topeParticipantes = dtcompetencia.topeParticipantes;
@@ -180,7 +181,7 @@ namespace BackEnd.Controllers
                 competenciaaux.posiciones.Add(nombre);
                 //nombreList.Add(nombre);
             }
-
+            competenciaaux.activa = false;
 
             _context.Entry(competenciaaux).State = EntityState.Modified;
 

@@ -22,6 +22,8 @@
         public bool ligaI { get; set; }
         public int topeParticipantes { get; set; }
 
+        public bool activa { get; set; }
+
         public Competencia()
         {
             posiciones = new List<Nombre>();
