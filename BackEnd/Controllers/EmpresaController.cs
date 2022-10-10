@@ -359,5 +359,59 @@ namespace BackEnd.Controllers
             }
             return Ok(usuariosPendientes);
         }
+
+        [HttpPost("AceptarORechazarUsuario")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> AceptarORechazarUsuario(int idUsuario, int idPenca, int idEmpresa, bool aceptar)
+        {
+            var pencas = _context.Pencas.Include(p => p.liga_Individual).ToList();
+            var empresas = _context.Empresas.Include(e => e.pencas_empresa).ToList();
+            var puntuaciones = _context.Puntuaciones.Include(p => p.usuario).Include(p => p.penca).ToList();
+
+            var existeEmpresa = false;
+            foreach (var empresa in empresas)
+            {
+                if (empresa.id == idEmpresa)
+                {
+                    existeEmpresa = true;
+                    var existePenca = false;
+                    foreach (var penca in pencas)
+                    {
+                        if (penca.id == idPenca)
+                        {
+                            existePenca = true;
+                            if (empresa.pencas_empresa.Contains(penca)) break;
+                            else return BadRequest("la penca no pertenece a esta empresa");
+                        }
+                    }
+                    if (!existePenca) return BadRequest("No existe la penca");
+                }
+            }
+            if (!existeEmpresa) return BadRequest("No existe la empresa");
+
+            var usuarioPertenece = false;
+            foreach (var puntuacion in puntuaciones)
+            {
+                if (puntuacion.penca.id == idPenca && puntuacion.usuario.id == idUsuario)
+                {
+                    usuarioPertenece = true;
+                    if (puntuacion.estado == estado_Penca.Pendiente)
+                    {
+                        if (aceptar) puntuacion.estado = estado_Penca.Aceptado;
+                        else puntuacion.estado = estado_Penca.Rechazado;
+                        _context.Puntuaciones.Add(puntuacion).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                        break;
+                    }
+                    else
+                    {
+                        return BadRequest("El usuario no esta pendiente de aceptación");
+                    }
+                }
+            }
+            if (usuarioPertenece) return NoContent();
+            else return BadRequest("el usuario no pertenece a la penca");
+        }
     }
 }
