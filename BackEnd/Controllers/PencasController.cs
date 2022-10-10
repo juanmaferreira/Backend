@@ -381,7 +381,7 @@ namespace BackEnd.Controllers
             List<Competencia> competenciaList = new List<Competencia>();
             foreach (var aux in ligasI)
             {
-                if (aux.Id == id)
+                if (aux.Id == penca.liga_Individual.Id)
                 {
                     foreach (var ligaCompetencias in aux.competencias)
                     {
