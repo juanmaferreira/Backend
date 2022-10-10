@@ -11,6 +11,10 @@ namespace BackEnd.Models.DataTypes
 
         public int Idvisitante { get; set; }
 
+        public string local { get; set; }
+
+        public string visitante { get; set; }   
+
         public Tipo_Resultado resultado { get; set; }
     }
 }

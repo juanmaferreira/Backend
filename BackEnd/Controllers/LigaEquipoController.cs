@@ -89,7 +89,8 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> getPartidos(int id)
         {
-            var ligaE = _context.Liga_Equipos.Include(e => e.partidos);
+            var ligaE = _context.Liga_Equipos.Include(e => e.partidos).ToList();
+            var partidos = _context.Partidos.Include(e => e.visitante_local).ToList();
 
             List<DtPartido> partidosList = new List<DtPartido>();
             
@@ -104,6 +105,15 @@ namespace BackEnd.Controllers
                         partido.Id = aux.id;
                         partido.fecha = aux.fechaPartido;
                         partido.resultado = aux.resultado;
+
+                        foreach(var e in partidos) {
+                            if(aux.id == e.id)
+                            {
+                                partido.visitante = e.visitante_local.ElementAt(0).nombreEquipo;
+                                partido.local = e.visitante_local.ElementAt(1).nombreEquipo;
+                                break;
+                            }
+                        }
 
                         partidosList.Add(partido);
                     }

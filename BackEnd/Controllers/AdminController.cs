@@ -107,7 +107,8 @@ namespace BackEnd.Controllers
         public async Task<IActionResult> listarPencasCompartidas(int id)
         {
 
-            var admin = _context.Administradores.Include(a => a.pencas);
+            var admin = _context.Administradores.Include(a => a.pencas).ToList();
+            var pencas = _context.Pencas.Include(a => a.liga_Individual).Include(a => a.liga_Equipo).ToList();
             List<DtPencasCompartida> pencasComp = new List<DtPencasCompartida>();
             foreach (var a in admin)
             {
@@ -124,6 +125,20 @@ namespace BackEnd.Controllers
                             pencasaCompartidas.entrada = aux.entrada;
                             pencasaCompartidas.pozo = aux.pozo;
                             pencasaCompartidas.Tipo_Liga = aux.tipo_Liga;
+
+                            foreach(var p in pencas)
+                            {
+                                if(aux.tipo_Liga == Tipo_Liga.Individual && p.id == aux.id)
+                                {
+                                    pencasaCompartidas.idLiga = p.liga_Individual.Id;
+                                }
+                                if (aux.tipo_Liga == Tipo_Liga.Equipo && p.id == aux.id)
+                                {
+                                    pencasaCompartidas.idLiga = p.liga_Equipo.id;
+                                }
+                            }
+
+
                             pencasComp.Add(pencasaCompartidas);
                         }
                         
