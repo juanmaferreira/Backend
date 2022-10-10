@@ -41,7 +41,7 @@ namespace BackEnd.Controllers
         public async Task<IActionResult> altaEquipo(DtCompetencia dtcompetencia)
         {
             Competencia competencia = new Competencia();
-            if (dtcompetencia.topeParticipantes < 2) return BadRequest("Debe tener al menos 3 cupos");
+            if (dtcompetencia.topeParticipantes < 3) return BadRequest("Debe tener al menos 3 cupos");
 
             competencia.Area = dtcompetencia.Area;
             competencia.fecha_competencia = dtcompetencia.fecha_competencia;
