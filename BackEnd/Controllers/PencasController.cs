@@ -210,7 +210,7 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> chequearLigaEquipoFinalizada(int id)
         {
-            var pencas = _context.Pencas.Include(le => le.liga_Equipo);
+            var pencas = _context.Pencas.Include(le => le.liga_Equipo).ToList();
             if (pencas == null) return BadRequest("No existen pencas");
             Penca penca = new Penca();
             foreach (var aux in pencas)
@@ -222,7 +222,7 @@ namespace BackEnd.Controllers
                 }
             }
             if (penca == null) return BadRequest("No existe la penca");
-            var ligasE = _context.Liga_Equipos.Include(p => p.partidos);
+            var ligasE = _context.Liga_Equipos.Include(p => p.partidos).ToList();
             Liga_Equipo le = new Liga_Equipo();
             foreach (var aux in ligasE)
             {
@@ -232,11 +232,12 @@ namespace BackEnd.Controllers
                     break;
                 }
             }
+            if(penca.tipo_Liga != Tipo_Liga.Equipo) return BadRequest("La liga no es de equipo");
             if (le.actualizarEstado()) return BadRequest("La liga aun no ha finalizado");
 
             penca.chequearEstadoLigaEquipo();
 
-            var pencasPuntaje = _context.Pencas.Include(p => p.participantes_puntos);
+            var pencasPuntaje = _context.Pencas.Include(p => p.participantes_puntos).ToList();
             foreach (var aux in pencasPuntaje)
             {
                 if (aux.id == id)
@@ -258,7 +259,7 @@ namespace BackEnd.Controllers
             
 
             if(penca.tipo_Penca == Tipo_Penca.Compartida) {
-                var Admins = _context.Administradores.Include(p => p.pencas);
+                var Admins = _context.Administradores.Include(p => p.pencas).ToList();
                 foreach (var a in Admins)
                 {
                     if (a.pencas.Contains(penca))
@@ -269,7 +270,7 @@ namespace BackEnd.Controllers
                 }
             }
             if(penca.tipo_Penca == Tipo_Penca.Empresa) {
-                var Empresas = _context.Empresas.Include(p => p.pencas_empresa);
+                var Empresas = _context.Empresas.Include(p => p.pencas_empresa).ToList();
                 foreach (var e in Empresas)
                 {
                     if (e.pencas_empresa.Contains(penca))
@@ -283,7 +284,7 @@ namespace BackEnd.Controllers
 
             int cantPart = posiciones.Count;
            
-            var usuarios = _context.Usuario.Include(p => p.puntos_por_penca);
+            var usuarios = _context.Usuario.Include(p => p.puntos_por_penca).ToList();
             foreach(var u in usuarios)
             {
                 foreach(var puntos in u.puntos_por_penca)
@@ -362,7 +363,7 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> chequearLigaIndividualFinalizada(int id)
         {
-            var pencas = _context.Pencas.Include(le => le.liga_Individual);
+            var pencas = _context.Pencas.Include(le => le.liga_Individual).ToList();
             if (pencas == null) return BadRequest("No existen pencas");
             Penca penca = new Penca();
             foreach (var aux in pencas)
@@ -374,9 +375,9 @@ namespace BackEnd.Controllers
                 }
             }
             if (penca == null) return BadRequest("No existe la penca");
-
-            var ligasI = _context.Liga_Individuales.Include(c => c.competencias);
-            var ligaIAux = _context.Competencias.Include(c => c.posiciones);
+            if (penca.tipo_Liga != Tipo_Liga.Individual) return BadRequest("La liga no es individual");
+            var ligasI = _context.Liga_Individuales.Include(c => c.competencias).ToList();
+            var ligaIAux = _context.Competencias.Include(c => c.posiciones).ToList();
             List<Competencia> competenciaList = new List<Competencia>();
             foreach (var aux in ligasI)
             {
@@ -407,7 +408,7 @@ namespace BackEnd.Controllers
 
             penca.chequearEstadoLigaIndividual();
 
-            var pencasPuntaje = _context.Pencas.Include(p => p.participantes_puntos);
+            var pencasPuntaje = _context.Pencas.Include(p => p.participantes_puntos).ToList();
             foreach (var aux in pencasPuntaje)
             {
                 if (aux.id == id)
@@ -427,7 +428,7 @@ namespace BackEnd.Controllers
             pozo -= comicionAdmin;
             if (penca.tipo_Penca == Tipo_Penca.Compartida)
             {
-                var Admins = _context.Administradores.Include(p => p.pencas);
+                var Admins = _context.Administradores.Include(p => p.pencas).ToList();
                 foreach (var a in Admins)
                 {
                     if (a.pencas.Contains(penca))
@@ -439,7 +440,7 @@ namespace BackEnd.Controllers
             }
             if (penca.tipo_Penca == Tipo_Penca.Empresa)
             {
-                var Empresas = _context.Empresas.Include(p => p.pencas_empresa);
+                var Empresas = _context.Empresas.Include(p => p.pencas_empresa).ToList();
                 foreach (var e in Empresas)
                 {
                     if (e.pencas_empresa.Contains(penca))
@@ -452,7 +453,7 @@ namespace BackEnd.Controllers
 
             int cantPart = posiciones.Count;
 
-            var usuarios = _context.Usuario.Include(p => p.puntos_por_penca);
+            var usuarios = _context.Usuario.Include(p => p.puntos_por_penca).ToList();
             foreach (var u in usuarios)
             {
                 foreach (var puntos in u.puntos_por_penca)

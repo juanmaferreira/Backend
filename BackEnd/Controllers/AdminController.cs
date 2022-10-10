@@ -125,16 +125,19 @@ namespace BackEnd.Controllers
                             pencasaCompartidas.entrada = aux.entrada;
                             pencasaCompartidas.pozo = aux.pozo;
                             pencasaCompartidas.Tipo_Liga = aux.tipo_Liga;
+                            pencasaCompartidas.estado = aux.estado;
 
                             foreach(var p in pencas)
                             {
                                 if(aux.tipo_Liga == Tipo_Liga.Individual && p.id == aux.id)
                                 {
                                     pencasaCompartidas.idLiga = p.liga_Individual.Id;
+                                    pencasaCompartidas.estadoLiga = p.liga_Individual.activa;
                                 }
                                 if (aux.tipo_Liga == Tipo_Liga.Equipo && p.id == aux.id)
                                 {
                                     pencasaCompartidas.idLiga = p.liga_Equipo.id;
+                                    pencasaCompartidas.estadoLiga = p.liga_Equipo.activa;
                                 }
                             }
 

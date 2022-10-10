@@ -75,14 +75,13 @@ namespace BackEnd.Controllers
             }
 
             var competencia = await _context.Competencias.FindAsync(idCompetencia);
-            
             if (competencia == null) return BadRequest("No existe la competencia.");
 
             if(comp.Count == 0)
             {
                 ligaI.competencias = new List<Competencia>();
             }
-            if (competencia.ligaI) return BadRequest();
+            if (competencia.ligaI) return BadRequest("Esta Competencia ya esta en otra liga");
             if(comp.Count < ligaI.topeCompetencias)
             {
                 competencia.ligaI = true;

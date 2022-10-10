@@ -28,8 +28,15 @@ namespace BackEnd.Models.Clases
             {
                 if (competencia.posiciones.Count() == 0)
                 {
-                    this.activa = true;
+                    activa = true;
                     break;
+                }
+                
+                if(listCompetencias.Count() < this.topeCompetencias || listCompetencias == null)
+                {
+                    activa = true;
+                    break;
+                    
                 }
             }
         return this.activa;

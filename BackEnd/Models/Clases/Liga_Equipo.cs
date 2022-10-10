@@ -22,7 +22,11 @@ namespace BackEnd.Models.Clases{
             
             foreach (var partido in partidos)
             {
-                Console.WriteLine(partido.resultado);
+                if(topePartidos != 0)
+                {
+                    activa = true;
+                    break;
+                }
                 if (partido.resultado == Tipo_Resultado.Indefinido)
                 {  
                     this.activa = true;

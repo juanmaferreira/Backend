@@ -17,5 +17,8 @@ namespace BackEnd.Models.DataTypes
 
         public Tipo_Liga Tipo_Liga { get; set; }
 
+        public bool estado { get; set; }
+        public bool estadoLiga { get; set; }
+
     }
 }
