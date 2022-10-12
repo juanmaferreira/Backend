@@ -1,5 +1,5 @@
 
-.vs/
+*.vs/*
 
 BackEnd/bin/
 
