@@ -1,9 +1,0 @@
-
-
-BackEnd/bin/*
-BackEnd/Data/*
-BackEnd/obj/*
-.vs/*
-*.json
-.vs/BackEnd/FileContentIndex/*
-.vs/BackEnd/v17/*
