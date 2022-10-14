@@ -574,7 +574,7 @@ namespace BackEnd.Controllers
                     return Ok(prediccion.tipo_Resultado);
                 }
             }
-            return NotFound("No se realizo una prediccion sobre este partido");
+            return Ok(Tipo_Resultado.Indefinido);
         }
 
         [HttpGet("verPrediccionCompetencia")]
