@@ -69,7 +69,7 @@ namespace BackEnd.Controllers
             superAdmin.email = dtSuperAdmin.Email;
             superAdmin.password = dtSuperAdmin.Password;
             superAdmin.economia = 0;
-            superAdmin.Tipo_Rol = Tipo_Rol.Admin;
+            superAdmin.Tipo_Rol = Tipo_Rol.SuperAdmin;
 
             await _context.SuperAdmins.AddAsync(superAdmin);
             await _context.SaveChangesAsync();
