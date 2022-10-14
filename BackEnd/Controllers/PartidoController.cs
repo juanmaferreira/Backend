@@ -27,12 +27,26 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetById(int id)
         {
-            var partido = await _context.Partidos.FindAsync(id);
+            var partidos = _context.Partidos.Include(e => e.visitante_local).ToList();
             DtPartido dtpartido = new DtPartido();
-            dtpartido.fecha = partido.fechaPartido;
-            dtpartido.resultado = partido.resultado;
+            foreach (var aux in partidos)
+            {
+                if(aux.id == id)
+                {
+                    
+                    dtpartido.fecha = aux.fechaPartido;
+                    dtpartido.resultado = aux.resultado;
+                    dtpartido.local = aux.visitante_local.ElementAt(1).nombreEquipo;
+                    dtpartido.visitante = aux.visitante_local.ElementAt(0).nombreEquipo;
+                    dtpartido.Idvisitante = aux.visitante_local.ElementAt(0).id;
+                    dtpartido.Idlocal = aux.visitante_local.ElementAt(1).id;
+                    dtpartido.Id = aux.id;
+                }
+            }
 
-            return partido == null ? NotFound() : Ok(dtpartido);
+            
+
+            return partidos == null ? NotFound() : Ok(dtpartido);
         }
 
         [HttpPost("altaPartido")]
