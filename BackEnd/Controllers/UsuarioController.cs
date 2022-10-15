@@ -164,7 +164,7 @@ namespace BackEnd.Controllers
         [HttpPut("recuperarContraseña")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> recuperarContraseña([FromBody] string email)
+        public async Task<IActionResult> recuperarContraseña(string email)
         {
             DbSet<Usuario> users = _context.Usuario;
             Usuario usuario = new Usuario();
@@ -175,6 +175,7 @@ namespace BackEnd.Controllers
                     usuario = aux;
                 }
             }
+            if (usuario.email == null) return BadRequest("No existe el usuario");
             usuario.password = usuario.generarContraseña();
 
  
