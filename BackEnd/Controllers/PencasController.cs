@@ -643,5 +643,32 @@ namespace BackEnd.Controllers
             }
             return Ok(posiciones);
         }
+
+        [HttpGet("getIdLIga/{id}")]
+        [ProducesResponseType(typeof(Penca), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> getIdLIga(int id)
+        {
+            var pencaLI = _context.Pencas.Include(i => i.liga_Individual).ToList();
+            var pencaLE = _context.Pencas.Include(e => e.liga_Equipo).ToList();
+
+
+            foreach(var aux in pencaLI)
+            {
+                if(aux.id == id && aux.tipo_Liga == Tipo_Liga.Individual)
+                {
+                    return Ok(aux.liga_Individual.Id);
+                }
+            }
+            foreach (var aux in pencaLE)
+            {
+                if (aux.id == id && aux.tipo_Liga == Tipo_Liga.Equipo)
+                {
+                    return Ok(aux.liga_Equipo.id);
+                }
+            }
+
+            return BadRequest("No tiene una liga asociada :(");
+        }
     }
 }
