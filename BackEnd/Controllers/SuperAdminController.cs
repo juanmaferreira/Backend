@@ -84,7 +84,7 @@ namespace BackEnd.Controllers
         {
             //try
             //{
-                SqlConnection conexion = new SqlConnection("server=DESKTOP-AKJETIH\\SQLEXPRESS ; database=PenqueApp ; integrated security = true");
+                SqlConnection conexion = new SqlConnection("server=DESKTOP-PC2R0JN\\SQLEXPRESS ; database=PenqueApp ; integrated security = true");
                 conexion.Open();
                 string cadena = "insert into participantes(nombre,Area) values ('Participante1', 1)";
                 SqlCommand comando = new SqlCommand(cadena, conexion);

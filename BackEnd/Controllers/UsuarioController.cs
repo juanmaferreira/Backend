@@ -546,7 +546,7 @@ namespace BackEnd.Controllers
         [HttpPut("depositarBilleteraUsuario/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> depositarBilleteraUsuario(int id,[FromBody] int monto)
+        public async Task<IActionResult> depositarBilleteraUsuario(int id, int monto)
         {
             var usuario = await _context.Usuario.FindAsync(id);
             if (usuario == null) return BadRequest("El usuario no existe");

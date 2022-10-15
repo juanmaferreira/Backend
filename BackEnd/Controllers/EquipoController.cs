@@ -53,7 +53,7 @@ namespace BackEnd.Controllers
         [HttpPut("agregarHistorial/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> actualizarHistorial(int id, [FromBody] Tipo_Historial tipo)
+        public async Task<IActionResult> actualizarHistorial(int id, Tipo_Historial tipo)
         {
             var team = await _context.Equipos.FindAsync(id);
             if (team == null) return BadRequest("El equipo ingresado es NULL");

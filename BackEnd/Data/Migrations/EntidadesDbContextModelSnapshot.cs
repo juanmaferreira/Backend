@@ -33,7 +33,7 @@ namespace BackEnd.Data.Migrations
                     b.Property<int>("Tipo_Rol")
                         .HasColumnType("int");
 
-                    b.Property<float>("billetera")
+                    b.Property<float?>("billetera")
                         .HasColumnType("real");
 
                     b.Property<string>("email")
@@ -55,8 +55,11 @@ namespace BackEnd.Data.Migrations
 
             modelBuilder.Entity("BackEnd.Models.Clases.Apuesta", b =>
                 {
-                    b.Property<string>("id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
 
                     b.Property<int>("competenciaId")
                         .HasColumnType("int");
@@ -116,12 +119,21 @@ namespace BackEnd.Data.Migrations
                     b.Property<int?>("Liga_IndividualId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("activa")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("fecha_competencia")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("ligaI")
+                        .HasColumnType("bit");
 
                     b.Property<string>("nombre")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("topeParticipantes")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -138,7 +150,7 @@ namespace BackEnd.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
 
-                    b.Property<float>("billetera")
+                    b.Property<float?>("billetera")
                         .HasColumnType("real");
 
                     b.Property<string>("email")
@@ -169,16 +181,11 @@ namespace BackEnd.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
 
-                    b.Property<int?>("Partidoid")
-                        .HasColumnType("int");
-
                     b.Property<string>("nombreEquipo")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("id");
-
-                    b.HasIndex("Partidoid");
 
                     b.ToTable("Equipos");
                 });
@@ -212,9 +219,15 @@ namespace BackEnd.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
 
+                    b.Property<bool>("activa")
+                        .HasColumnType("bit");
+
                     b.Property<string>("nombreLiga")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("topePartidos")
+                        .HasColumnType("int");
 
                     b.HasKey("id");
 
@@ -232,6 +245,12 @@ namespace BackEnd.Data.Migrations
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("activa")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("topeCompetencias")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -295,7 +314,7 @@ namespace BackEnd.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("CompetenciaId")
+                    b.Property<int>("Area")
                         .HasColumnType("int");
 
                     b.Property<string>("nombre")
@@ -303,8 +322,6 @@ namespace BackEnd.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CompetenciaId");
 
                     b.ToTable("Participantes");
                 });
@@ -319,6 +336,9 @@ namespace BackEnd.Data.Migrations
 
                     b.Property<int?>("Liga_Equipoid")
                         .HasColumnType("int");
+
+                    b.Property<bool>("enUso")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("fechaPartido")
                         .HasColumnType("datetime2");
@@ -360,10 +380,10 @@ namespace BackEnd.Data.Migrations
                     b.Property<DateTime>("fecha_Creacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("liga_Equipoid")
+                    b.Property<int?>("liga_Equipoid")
                         .HasColumnType("int");
 
-                    b.Property<int>("liga_IndividualId")
+                    b.Property<int?>("liga_IndividualId")
                         .HasColumnType("int");
 
                     b.Property<string>("nombre")
@@ -498,7 +518,7 @@ namespace BackEnd.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
 
-                    b.Property<float>("billetera")
+                    b.Property<float?>("billetera")
                         .HasColumnType("real");
 
                     b.Property<string>("email")
@@ -519,6 +539,36 @@ namespace BackEnd.Data.Migrations
                     b.HasKey("id");
 
                     b.ToTable("Usuario");
+                });
+
+            modelBuilder.Entity("CompetenciaParticipante", b =>
+                {
+                    b.Property<int>("competenciasId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("participantesId")
+                        .HasColumnType("int");
+
+                    b.HasKey("competenciasId", "participantesId");
+
+                    b.HasIndex("participantesId");
+
+                    b.ToTable("CompetenciaParticipante");
+                });
+
+            modelBuilder.Entity("EquipoPartido", b =>
+                {
+                    b.Property<int>("partidosid")
+                        .HasColumnType("int");
+
+                    b.Property<int>("visitante_localid")
+                        .HasColumnType("int");
+
+                    b.HasKey("partidosid", "visitante_localid");
+
+                    b.HasIndex("visitante_localid");
+
+                    b.ToTable("EquipoPartido");
                 });
 
             modelBuilder.Entity("BackEnd.Models.Clases.Apuesta", b =>
@@ -566,13 +616,6 @@ namespace BackEnd.Data.Migrations
                         .HasForeignKey("Liga_IndividualId");
                 });
 
-            modelBuilder.Entity("BackEnd.Models.Clases.Equipo", b =>
-                {
-                    b.HasOne("BackEnd.Models.Clases.Partido", null)
-                        .WithMany("visitante_local")
-                        .HasForeignKey("Partidoid");
-                });
-
             modelBuilder.Entity("BackEnd.Models.Clases.Historial", b =>
                 {
                     b.HasOne("BackEnd.Models.Clases.Equipo", null)
@@ -598,13 +641,6 @@ namespace BackEnd.Data.Migrations
                         .HasForeignKey("CompetenciaId");
                 });
 
-            modelBuilder.Entity("BackEnd.Models.Clases.Participante", b =>
-                {
-                    b.HasOne("BackEnd.Models.Clases.Competencia", null)
-                        .WithMany("participantes")
-                        .HasForeignKey("CompetenciaId");
-                });
-
             modelBuilder.Entity("BackEnd.Models.Clases.Partido", b =>
                 {
                     b.HasOne("BackEnd.Models.Clases.Liga_Equipo", null)
@@ -623,16 +659,12 @@ namespace BackEnd.Data.Migrations
                         .HasForeignKey("Empresaid");
 
                     b.HasOne("BackEnd.Models.Clases.Liga_Equipo", "liga_Equipo")
-                        .WithMany()
-                        .HasForeignKey("liga_Equipoid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("pencas")
+                        .HasForeignKey("liga_Equipoid");
 
                     b.HasOne("BackEnd.Models.Clases.Liga_Individual", "liga_Individual")
-                        .WithMany()
-                        .HasForeignKey("liga_IndividualId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("pencas")
+                        .HasForeignKey("liga_IndividualId");
 
                     b.Navigation("liga_Equipo");
 
@@ -677,6 +709,36 @@ namespace BackEnd.Data.Migrations
                     b.Navigation("usuario");
                 });
 
+            modelBuilder.Entity("CompetenciaParticipante", b =>
+                {
+                    b.HasOne("BackEnd.Models.Clases.Competencia", null)
+                        .WithMany()
+                        .HasForeignKey("competenciasId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackEnd.Models.Clases.Participante", null)
+                        .WithMany()
+                        .HasForeignKey("participantesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("EquipoPartido", b =>
+                {
+                    b.HasOne("BackEnd.Models.Clases.Partido", null)
+                        .WithMany()
+                        .HasForeignKey("partidosid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackEnd.Models.Clases.Equipo", null)
+                        .WithMany()
+                        .HasForeignKey("visitante_localid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("BackEnd.Models.Clases.Administrador", b =>
                 {
                     b.Navigation("pencas");
@@ -690,8 +752,6 @@ namespace BackEnd.Data.Migrations
             modelBuilder.Entity("BackEnd.Models.Clases.Competencia", b =>
                 {
                     b.Navigation("apuestas");
-
-                    b.Navigation("participantes");
 
                     b.Navigation("posiciones");
                 });
@@ -711,18 +771,20 @@ namespace BackEnd.Data.Migrations
             modelBuilder.Entity("BackEnd.Models.Clases.Liga_Equipo", b =>
                 {
                     b.Navigation("partidos");
+
+                    b.Navigation("pencas");
                 });
 
             modelBuilder.Entity("BackEnd.Models.Clases.Liga_Individual", b =>
                 {
                     b.Navigation("competencias");
+
+                    b.Navigation("pencas");
                 });
 
             modelBuilder.Entity("BackEnd.Models.Clases.Partido", b =>
                 {
                     b.Navigation("predicciones");
-
-                    b.Navigation("visitante_local");
                 });
 
             modelBuilder.Entity("BackEnd.Models.Clases.Penca", b =>
