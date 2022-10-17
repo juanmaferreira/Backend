@@ -34,17 +34,19 @@ namespace BackEnd.Controllers
 
 
             var competencias = _context.Competencias.ToList();
-            DtCompetencia dtC = new DtCompetencia();
+            List<DtCompetencia> dtcompetencias = new List<DtCompetencia>();
             foreach (var aux in competencias)
             {
-                if (!aux.ligaI)
+                if (!aux.ligaI && aux.posiciones.Count == 0)
                 {
+                    DtCompetencia dtC = new DtCompetencia();
                     dtC.Id = aux.Id;
                     dtC.nombre = aux.nombre;
+                    dtcompetencias.Add(dtC);
 
                 }
             }
-            return competencias == null ? NotFound() : Ok(dtC);
+            return dtcompetencias == null ? NotFound() : Ok(dtcompetencias);
         }
 
         [HttpGet("{id}")]

@@ -28,18 +28,20 @@ namespace BackEnd.Controllers
         public async Task<IActionResult> getPartidosSinUsar()
         {
             var partidos = _context.Partidos.ToList();
-            DtPartido dtpartido = new DtPartido();
+            List<DtPartido> dtpartidos = new List<DtPartido>();
+            
             foreach (var aux in partidos)
             {
-                if (!aux.enUso)
+                if (!aux.enUso && aux.resultado == Tipo_Resultado.Indefinido)
                 {
-
+                    DtPartido dtpartido = new DtPartido();
                     dtpartido.fecha = aux.fechaPartido;
                     dtpartido.resultado = aux.resultado;
                     dtpartido.Id = aux.id;
+                    dtpartidos.Add(dtpartido);
                 }
             }
-            return partidos == null ? NotFound() : Ok(dtpartido);
+            return dtpartidos == null ? NotFound() : Ok(dtpartidos);
         }
 
         [HttpGet("{id}")]
