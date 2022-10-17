@@ -4,8 +4,6 @@ using System.Runtime.InteropServices;
 
 namespace BackEnd.Models.Clases{
 
-    
-
     public class Equipo{
 
         public int id { get; set; }
@@ -16,6 +14,7 @@ namespace BackEnd.Models.Clases{
 
         public List<Partido> partidos { get; set; }
 
+        public Tipo_Deporte deporte { get; set; }
 
         public void agregarHistorial(Tipo_Historial tipo)
         {

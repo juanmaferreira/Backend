@@ -28,5 +28,7 @@ namespace BackEnd.Models.Clases{
         public List<Prediccion> predicciones { get; set; }
 
         public bool enUso { get; set; }
+
+        public Tipo_Deporte Tipo_Deporte { get; set; }
     }
 }
