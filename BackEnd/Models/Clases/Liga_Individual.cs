@@ -11,6 +11,8 @@ namespace BackEnd.Models.Clases
         public List<Penca> pencas { get; set; }
         public int topeCompetencias { get; set; }
         public bool activa { get; set; }
+
+        public Tipo_Area tipoArea { get; set; }
         public Liga_Individual()
         {
             competencias = new List<Competencia>();

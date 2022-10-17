@@ -13,6 +13,8 @@ namespace BackEnd.Models.Clases{
 		public int topePartidos { get; set; }
         public bool activa { get; set; }
 
+        public Tipo_Deporte tipoDeporte { get; set; }
+
         public Liga_Equipo() { 
 			partidos = new List<Partido>();
 		}

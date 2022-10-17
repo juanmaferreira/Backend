@@ -46,6 +46,7 @@ namespace BackEnd.Controllers
                     DtLigaEquipo dtLE = new DtLigaEquipo();
                     dtLE.nombreLiga = aux.nombreLiga;
                     dtLE.tope = aux.topePartidos;
+                    dtLE.tipoDeporte = aux.tipoDeporte;
 
                     dtLigaE.Add(dtLE);
                 }
@@ -61,6 +62,7 @@ namespace BackEnd.Controllers
             Liga_Equipo ligaE = new Liga_Equipo();
 
             ligaE.nombreLiga = dtLigaEquipo.nombreLiga;
+            ligaE.tipoDeporte = dtLigaEquipo.tipoDeporte;
             if(dtLigaEquipo.tope < 3)
             {
                 return BadRequest("El tope de la liga debe ser al menos de 3 partidos.");
