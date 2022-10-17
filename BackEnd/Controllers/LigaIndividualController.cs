@@ -31,12 +31,36 @@ namespace BackEnd.Controllers
             return ligaI == null ? NotFound() : Ok(ligaI);
         }
 
+        [HttpGet("getLigasSinUsar")]
+        [ProducesResponseType(typeof(Liga_Individual), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> getLigasSinUsar()
+        {
+            var lIs = _context.Liga_Individuales.ToList();
+            List<DtLiga_Individual> dtLigaI = new List<DtLiga_Individual>();
+
+            foreach (var aux in lIs)
+            {
+                if (aux.activa && aux.topeCompetencias > aux.competencias.Count())
+                {
+                    DtLiga_Individual dtLI = new DtLiga_Individual();
+                    dtLI.Nombre = aux.Nombre;
+                    dtLI.topeCompetencias = aux.topeCompetencias;
+                    dtLI.tipoArea = aux.tipoArea;
+
+                    dtLigaI.Add(dtLI);
+                }
+            }
+            return dtLigaI == null ? NotFound() : Ok(dtLigaI);
+        }
+
         [HttpPost("altaLigaIndividual")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> altaLigaI(DtLiga_Individual ligaI)
         {
             Liga_Individual liga = new Liga_Individual();
             liga.Nombre = ligaI.Nombre;
+            liga.tipoDeporte = ligaI.tipoDeporte;
             if(ligaI.topeCompetencias < 3)
             {
                 return BadRequest("La liga debe tener al menos 3 competencias.");

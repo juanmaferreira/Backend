@@ -29,7 +29,7 @@ namespace BackEnd.Controllers
         [HttpGet("getCompetenciasSinUsar")]
         [ProducesResponseType(typeof(Competencia), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> getCompetenciasSinUsar()
+        public async Task<IActionResult> getCompetenciasSinUsar(Tipo_Area area)
         {
 
 
@@ -37,7 +37,7 @@ namespace BackEnd.Controllers
             List<DtCompetencia> dtcompetencias = new List<DtCompetencia>();
             foreach (var aux in competencias)
             {
-                if (!aux.ligaI && aux.posiciones.Count == 0)
+                if (!aux.ligaI && aux.posiciones.Count == 0 && aux.Area == area)
                 {
                     DtCompetencia dtC = new DtCompetencia();
                     dtC.Id = aux.Id;

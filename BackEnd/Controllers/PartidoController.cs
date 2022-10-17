@@ -25,7 +25,7 @@ namespace BackEnd.Controllers
         [HttpGet("getPartidosSinUsar")]
         [ProducesResponseType(typeof(Partido), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> getPartidosSinUsar()
+        public async Task<IActionResult> getPartidosSinUsar(Tipo_Deporte tipo)
         {
             var partidos = _context.Partidos.ToList();
             List<DtPartido> dtpartidos = new List<DtPartido>();
