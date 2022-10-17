@@ -22,6 +22,26 @@ namespace BackEnd.Controllers
             return await _context.Partidos.ToListAsync();
         }
 
+        [HttpGet("getPartidosSinUsar")]
+        [ProducesResponseType(typeof(Partido), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> getPartidosSinUsar()
+        {
+            var partidos = _context.Partidos.ToList();
+            DtPartido dtpartido = new DtPartido();
+            foreach (var aux in partidos)
+            {
+                if (!aux.enUso)
+                {
+
+                    dtpartido.fecha = aux.fechaPartido;
+                    dtpartido.resultado = aux.resultado;
+                    dtpartido.Id = aux.id;
+                }
+            }
+            return partidos == null ? NotFound() : Ok(dtpartido);
+        }
+
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Partido), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

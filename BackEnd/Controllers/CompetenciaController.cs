@@ -23,6 +23,28 @@ namespace BackEnd.Controllers
         public async Task<IEnumerable<Competencia>> Get()
         {
             return await _context.Competencias.ToListAsync();
+
+        }
+
+        [HttpGet("getCompetenciasSinUsar")]
+        [ProducesResponseType(typeof(Competencia), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> getCompetenciasSinUsar()
+        {
+
+
+            var competencias = _context.Competencias.ToList();
+            DtCompetencia dtC = new DtCompetencia();
+            foreach (var aux in competencias)
+            {
+                if (!aux.ligaI)
+                {
+                    dtC.Id = aux.Id;
+                    dtC.nombre = aux.nombre;
+
+                }
+            }
+            return competencias == null ? NotFound() : Ok(dtC);
         }
 
         [HttpGet("{id}")]
