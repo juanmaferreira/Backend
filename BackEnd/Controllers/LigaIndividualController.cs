@@ -47,6 +47,7 @@ namespace BackEnd.Controllers
                     dtLI.Nombre = aux.Nombre;
                     dtLI.topeCompetencias = aux.topeCompetencias;
                     dtLI.tipoArea = aux.tipoArea;
+                    dtLI.Id = dtLI.Id;
 
                     dtLigaI.Add(dtLI);
                 }
@@ -60,7 +61,7 @@ namespace BackEnd.Controllers
         {
             Liga_Individual liga = new Liga_Individual();
             liga.Nombre = ligaI.Nombre;
-            liga.tipoDeporte = ligaI.tipoDeporte;
+            liga.tipoArea = ligaI.tipoArea;
             if(ligaI.topeCompetencias < 3)
             {
                 return BadRequest("La liga debe tener al menos 3 competencias.");

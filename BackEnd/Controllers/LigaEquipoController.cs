@@ -47,6 +47,7 @@ namespace BackEnd.Controllers
                     dtLE.nombreLiga = aux.nombreLiga;
                     dtLE.tope = aux.topePartidos;
                     dtLE.tipoDeporte = aux.tipoDeporte;
+                    dtLE.id = aux.id;
 
                     dtLigaE.Add(dtLE);
                 }
@@ -79,7 +80,7 @@ namespace BackEnd.Controllers
         [HttpPut("agregarPartido/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> actualizarResultado(int id, DtPartido dtPartido)
+        public async Task<IActionResult> actualizarResultado(int id, int idPartido)
         {
             var ligaE = await _context.Liga_Equipos.FindAsync(id);
             if (ligaE == null) return BadRequest("No existe la liga");
@@ -91,7 +92,7 @@ namespace BackEnd.Controllers
                     
                 }
             }
-            var partido = await _context.Partidos.FindAsync(dtPartido.Id);
+            var partido = await _context.Partidos.FindAsync(idPartido);
             if (partido == null) return BadRequest("No existe el partido");
             if (partido.enUso) return BadRequest("Este partido ya existe en otra liga");
             if (ligaE.partidos == null)
@@ -126,7 +127,7 @@ namespace BackEnd.Controllers
                     foreach (var aux in item.partidos)
                     {
                         DtPartido partido = new DtPartido();
-                        partido.Id = aux.id;
+                        partido.id = aux.id;
                         partido.fecha = aux.fechaPartido;
                         partido.resultado = aux.resultado;
 

@@ -27,17 +27,19 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> getPartidosSinUsar(Tipo_Deporte tipo)
         {
-            var partidos = _context.Partidos.ToList();
+            var partidos = _context.Partidos.Include(e => e.visitante_local).ToList();
             List<DtPartido> dtpartidos = new List<DtPartido>();
             
             foreach (var aux in partidos)
             {
-                if (!aux.enUso && aux.resultado == Tipo_Resultado.Indefinido)
+                if (!aux.enUso && aux.resultado == Tipo_Resultado.Indefinido && aux.Tipo_Deporte == tipo)
                 {
                     DtPartido dtpartido = new DtPartido();
                     dtpartido.fecha = aux.fechaPartido;
                     dtpartido.resultado = aux.resultado;
-                    dtpartido.Id = aux.id;
+                    dtpartido.id = aux.id;
+                    dtpartido.visitante = aux.visitante_local.ElementAt(0).nombreEquipo;
+                    dtpartido.local = aux.visitante_local.ElementAt(1).nombreEquipo;
                     dtpartidos.Add(dtpartido);
                 }
             }
@@ -62,7 +64,7 @@ namespace BackEnd.Controllers
                     dtpartido.visitante = aux.visitante_local.ElementAt(0).nombreEquipo;
                     dtpartido.Idvisitante = aux.visitante_local.ElementAt(0).id;
                     dtpartido.Idlocal = aux.visitante_local.ElementAt(1).id;
-                    dtpartido.Id = aux.id;
+                    dtpartido.id = aux.id;
                 }
             }
 
@@ -83,6 +85,7 @@ namespace BackEnd.Controllers
             if (local == null || visitante == null) return BadRequest("Uno de los equipos ingresados es NULL");
             if (local.id == visitante.id) return BadRequest("No puedes elejir que compita contra si mismo");
 
+            partido.Tipo_Deporte = dtpartido.deporte;
             partido.fechaPartido = dtpartido.fecha;
             partido.visitante_local = new List<Equipo> {visitante, local};
             partido.enUso = false;
@@ -104,7 +107,7 @@ namespace BackEnd.Controllers
             _context.Entry(local).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetById), new { id = dtpartido.Id }, dtpartido);
+            return CreatedAtAction(nameof(GetById), new { id = dtpartido.id }, dtpartido);
         }
 
         [HttpGet("EquiposGet/{id}")]
