@@ -47,7 +47,7 @@ namespace BackEnd.Controllers
                     dtLI.Nombre = aux.Nombre;
                     dtLI.topeCompetencias = aux.topeCompetencias;
                     dtLI.tipoArea = aux.tipoArea;
-                    dtLI.Id = dtLI.Id;
+                    dtLI.Id = aux.Id;
 
                     dtLigaI.Add(dtLI);
                 }
