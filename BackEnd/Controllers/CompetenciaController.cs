@@ -42,6 +42,7 @@ namespace BackEnd.Controllers
                     DtCompetencia dtC = new DtCompetencia();
                     dtC.Id = aux.Id;
                     dtC.nombre = aux.nombre;
+                    dtC.Area = aux.Area;
                     dtcompetencias.Add(dtC);
 
                 }
