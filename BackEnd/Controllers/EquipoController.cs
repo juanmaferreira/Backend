@@ -37,6 +37,7 @@ namespace BackEnd.Controllers
         {
             Equipo team = new Equipo();
             team.nombreEquipo = equipo.Name;
+            team.deporte = equipo.Deporte;
 
             var equipos = _context.Equipos.ToList();
             foreach(var e in equipos)
@@ -75,7 +76,7 @@ namespace BackEnd.Controllers
         [HttpGet("mostrarHistorial/{id}")]
         [ProducesResponseType(typeof(Equipo), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetEquipoById(int id)
+        public async Task<IActionResult> GetHistorialEquipoById(int id)
         {
             var equipo = _context.Equipos.Include(e => e.historiales);
             Equipo equipo2 = new Equipo();
@@ -104,9 +105,24 @@ namespace BackEnd.Controllers
             return Ok(historial);
         }
 
-        
+        [HttpGet("equiposPorDeporte")]
+        [ProducesResponseType(typeof(Equipo), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetEquiposByDeporte(Tipo_Deporte Tipo_Deporte)
+        {
+            var equipos = _context.Equipos.ToList();
+            List<DtEquipo> equiposPorDeporte = new List<DtEquipo>();
+            foreach (var equipo in equipos)
+            {
+                if (equipo.deporte == Tipo_Deporte)
+                {
+                    DtEquipo dtEquipo = new DtEquipo();
+                    dtEquipo.Id = equipo.id;
+                    dtEquipo.Name = equipo.nombreEquipo;
+                    equiposPorDeporte.Add(dtEquipo);
+                }
+            }
+            return Ok(equiposPorDeporte);
+        }
     }
-
-    
 
 }

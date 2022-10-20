@@ -85,7 +85,7 @@ namespace BackEnd.Controllers
         [HttpPut("agregarParticipante/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> agregarParticipante(int id, DtParticipante participante)
+        public async Task<IActionResult> agregarParticipante(int id, int idParticipante)
         {
             var competencia = await _context.Competencias.FindAsync(id);
             //Si la competencia no existe
@@ -106,7 +106,7 @@ namespace BackEnd.Controllers
                 }
             }
 
-            var part = await _context.Participantes.FindAsync(participante.Id);
+            var part = await _context.Participantes.FindAsync(idParticipante);
             if (part == null) return BadRequest();
 
             //Comp.ForEachAsync(Console.WriteLine);

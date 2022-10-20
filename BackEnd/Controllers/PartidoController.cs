@@ -32,7 +32,7 @@ namespace BackEnd.Controllers
             
             foreach (var aux in partidos)
             {
-                if (!aux.enUso && aux.resultado == Tipo_Resultado.Indefinido && aux.Tipo_Deporte == tipo)
+                if (!aux.enUso && aux.resultado == Tipo_Resultado.Indefinido && aux.deporte == tipo)
                 {
                     DtPartido dtpartido = new DtPartido();
                     dtpartido.fecha = aux.fechaPartido;
@@ -85,7 +85,7 @@ namespace BackEnd.Controllers
             if (local == null || visitante == null) return BadRequest("Uno de los equipos ingresados es NULL");
             if (local.id == visitante.id) return BadRequest("No puedes elejir que compita contra si mismo");
 
-            partido.Tipo_Deporte = dtpartido.deporte;
+            partido.deporte = dtpartido.deporte;
             partido.fechaPartido = dtpartido.fecha;
             partido.visitante_local = new List<Equipo> {visitante, local};
             partido.enUso = false;
