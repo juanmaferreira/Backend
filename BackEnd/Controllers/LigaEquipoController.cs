@@ -55,6 +55,30 @@ namespace BackEnd.Controllers
             return dtLigaE == null ? NotFound() : Ok(dtLigaE);
         }
 
+        [HttpGet("getLigasPorDeporte")]
+        [ProducesResponseType(typeof(Liga_Equipo), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> getLigasPorDeporte(Tipo_Deporte tipo)
+        {
+            var lEs = _context.Liga_Equipos.ToList();
+            List<DtLigaEquipo> dtLigaE = new List<DtLigaEquipo>();
+
+            foreach (var aux in lEs)
+            {
+                if (aux.activa && aux.topePartidos != 0 && aux.tipoDeporte == tipo)
+                {
+                    DtLigaEquipo dtLE = new DtLigaEquipo();
+                    dtLE.nombreLiga = aux.nombreLiga;
+                    dtLE.tope = aux.topePartidos;
+                    dtLE.tipoDeporte = aux.tipoDeporte;
+                    dtLE.id = aux.id;
+
+                    dtLigaE.Add(dtLE);
+                }
+            }
+            return dtLigaE == null ? NotFound() : Ok(dtLigaE);
+        }
+
         [HttpPost("altaLigaEquipo")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
