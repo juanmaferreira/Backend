@@ -95,6 +95,7 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> altaPencaEmpresa(DtPencaEmpresa dtPE)
         {
+
             Penca penca = new Penca();
 
             penca.nombre = dtPE.nombre;
@@ -112,6 +113,13 @@ namespace BackEnd.Controllers
             var empresa = await _context.Empresas.FindAsync(dtPE.idEmpresa);
             if (LigaE == null) return BadRequest("No existe la liga");
             if (empresa == null) return BadRequest("No existe la empresa");
+
+            if(dtPE.tipoPlan == Tipo_Plan.Premium){
+
+                if (empresa.billetera < 1000) return BadRequest("No tienes saldo suficiente para realizar esta penca");
+                empresa.billetera -= 1000;
+            }
+            penca.tipo_Plan = dtPE.tipoPlan;
 
             if (LigaE != null)
             {
@@ -131,6 +139,7 @@ namespace BackEnd.Controllers
                 empresa.pencas_empresa = new List<Penca>();
             }
             empresa.pencas_empresa.Add(penca);
+            _context.Entry(empresa).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
             return Ok(dtPE);
@@ -158,6 +167,13 @@ namespace BackEnd.Controllers
             var empresa = await _context.Empresas.FindAsync(dtPE.idEmpresa);
             if (LigaI == null) return BadRequest("No existe la liga");
             if (empresa == null) return BadRequest("No existe la empresa");
+            if (dtPE.tipoPlan == Tipo_Plan.Premium)
+            {
+
+                if (empresa.billetera < 1000) return BadRequest("No tienes saldo suficiente para realizar esta penca");
+                empresa.billetera -= 1000;
+            }
+            penca.tipo_Plan = dtPE.tipoPlan;
 
             if (LigaI != null)
             {
@@ -177,6 +193,7 @@ namespace BackEnd.Controllers
                 empresa.pencas_empresa = new List<Penca>();
             }
             empresa.pencas_empresa.Add(penca);
+            _context.Entry(empresa).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
             return Ok(dtPE);
@@ -669,6 +686,21 @@ namespace BackEnd.Controllers
             }
 
             return BadRequest("No tiene una liga asociada :(");
+        }
+
+        [HttpPut("cambiarColor/{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> cambiarColor(int id, string color)
+        {
+            var penca = await _context.Pencas.FindAsync(id);
+            if (penca == null) return BadRequest("No existe la penca");
+
+            penca.color = color;
+
+            _context.Entry(penca).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
     }
 }
