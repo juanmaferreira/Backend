@@ -123,10 +123,14 @@ namespace BackEnd.Controllers
         public async Task<IActionResult> loginGoogle(DtGoogle dtG)
         {
             DbSet<Usuario> users = _context.Usuario;
+            DbSet<Empresa> empresa = _context.Empresas;
+            DbSet<Administrador> administrador = _context.Administradores;
+            DbSet<SuperAdmin> superadmin = _context.SuperAdmins;
             foreach (var aux in users)
             {
                 if (aux.email == dtG.email)
                 {
+                   
                         DtUsuario dtUsuario = new DtUsuario();
                         dtUsuario.Id = aux.id;
                         dtUsuario.tipo_rol = aux.tipoRol;
@@ -137,7 +141,51 @@ namespace BackEnd.Controllers
                         return aux == null ? NotFound() : Ok(dtUsuario);
                 }
             }
+            foreach (var aux in empresa)
+            {
+                if (aux.email == dtG.email)
+                {
+                    
+                        DtEmpresa dtEmpresa = new DtEmpresa();
+                        dtEmpresa.Id = aux.id;
+                        dtEmpresa.Name = aux.nombre;
+                        dtEmpresa.Billetera = aux.billetera;
+                        dtEmpresa.Email = aux.email;
+                        dtEmpresa.tipo_rol = aux.tipoRol;
+                        return aux == null ? NotFound() : Ok(dtEmpresa);
+                 
+                }
+            }
+            foreach (var aux in administrador)
+            {
+                if (aux.email == dtG.email)
+                {
+                    
+                        DtAdmin dtAdmin = new DtAdmin();
+                        dtAdmin.Id = aux.Id;
+                        dtAdmin.Name = aux.nombre;
+                        dtAdmin.Email = aux.email;
+                        dtAdmin.Billetera = aux.billetera;
+                        dtAdmin.tipo_rol = aux.Tipo_Rol;
+                        return aux == null ? NotFound() : Ok(dtAdmin);
+                
+                }
+            }
+            foreach (var aux in superadmin)
+            {
+                if (aux.email == dtG.email)
+                {
+                   
+                        DtSuperAdmin dtSAdmin = new DtSuperAdmin();
+                        dtSAdmin.Id = aux.Id;
+                        dtSAdmin.Name = aux.nombre;
+                        dtSAdmin.Email = aux.email;
+                        dtSAdmin.Economia = aux.economia;
+                        dtSAdmin.tipo_rol = aux.Tipo_Rol;
 
+                        return aux == null ? NotFound() : Ok(dtSAdmin);
+                }
+            }
             Usuario usuario = new Usuario();
             usuario.email = dtG.email;
             usuario.nombre = dtG.nombre;
