@@ -116,7 +116,48 @@ namespace BackEnd.Controllers
             }
             return BadRequest("No existe el usuario en el sistema");
         }
-                    
+
+        [HttpPost("loginGoogle")]
+        [ProducesResponseType(typeof(Usuario), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> loginGoogle(DtGoogle dtG)
+        {
+            DbSet<Usuario> users = _context.Usuario;
+            foreach (var aux in users)
+            {
+                if (aux.email == dtG.email)
+                {
+                        DtUsuario dtUsuario = new DtUsuario();
+                        dtUsuario.Id = aux.id;
+                        dtUsuario.tipo_rol = aux.tipoRol;
+                        dtUsuario.email = aux.email;
+                        dtUsuario.Nombre = aux.nombre;
+                        dtUsuario.billetera = aux.billetera;
+
+                        return aux == null ? NotFound() : Ok(dtUsuario);
+                }
+            }
+
+            Usuario usuario = new Usuario();
+            usuario.email = dtG.email;
+            usuario.nombre = dtG.nombre;
+            usuario.password = usuario.generarContraseña();
+            usuario.billetera = 0;
+            usuario.tipoRol = Tipo_Rol.Comun;
+
+            await _context.Usuario.AddAsync(usuario);
+            await _context.SaveChangesAsync();
+
+            DtUsuario dtU = new DtUsuario();
+            dtU.Id = usuario.id;
+            dtU.tipo_rol = usuario.tipoRol;
+            dtU.email = usuario.email;
+            dtU.Nombre = usuario.nombre;
+            dtU.billetera = usuario.billetera;
+
+            return Ok(dtU);
+        }
+
 
         [HttpPost("Registro")]
         [ProducesResponseType(StatusCodes.Status201Created)]
