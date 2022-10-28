@@ -91,11 +91,15 @@ namespace BackEnd.Controllers
                 {
                     foreach (var aux2 in aux.pencas_empresa)
                     {
-                        DtPencaEmpresa dtPE = new DtPencaEmpresa();
-                        dtPE.id = aux2.id;
-                        dtPE.nombre = aux2.nombre;
-                        dtPE.tipoPlan = aux2.tipo_Plan;
-                        dtequipo.Add(dtPE);
+                        if (aux2.estado) {
+                            DtPencaEmpresa dtPE = new DtPencaEmpresa();
+                            dtPE.id = aux2.id;
+                            dtPE.nombre = aux2.nombre;
+                            dtPE.tipoPlan = aux2.tipo_Plan;
+                            dtequipo.Add(dtPE);
+
+                        }
+                        
 
                     }
                     return Ok(dtequipo);
