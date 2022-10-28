@@ -160,8 +160,9 @@ namespace BackEnd.Controllers
             penca.fecha_Creacion = new DateTime();
             penca.estado = true;
             penca.color = "";
-            penca.tipo_Liga = Tipo_Liga.Equipo;
+            penca.tipo_Liga = Tipo_Liga.Individual;
             penca.liga_Equipo = null;
+            penca.tipo_Liga = dtPE.tipo_Liga;
 
             var LigaI = await _context.Liga_Individuales.FindAsync(dtPE.idLiga);
             var empresa = await _context.Empresas.FindAsync(dtPE.idEmpresa);

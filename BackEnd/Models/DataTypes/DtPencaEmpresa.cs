@@ -19,5 +19,7 @@ namespace BackEnd.Models.DataTypes
 
         public int idEmpresa { get; set; }
 
+        public Tipo_Liga tipo_Liga { get; set; }
+
     }
 }
