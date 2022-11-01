@@ -158,6 +158,7 @@ namespace BackEnd.Controllers
                 DtParticipante part = new DtParticipante();
                 part.Id = dt.Id;
                 part.nombre = dt.nombre;
+                part.Area = dt.Area;
                 dtPart.Add(part);
             }
 
