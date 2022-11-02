@@ -279,7 +279,7 @@ namespace BackEnd.Controllers
             {
                 foreach(var puntos in penca.participantes_puntos)
                 {
-                    if (aux.puntos_por_penca.Contains(puntos)) return BadRequest("El usuario ya ha sido invitado");
+                    if (aux.puntos_por_penca.Contains(puntos) && aux.email == dtInvitacion.emailUsr) return BadRequest("El usuario ya ha sido invitado");
                 }
 
                 if (aux.email == dtInvitacion.emailUsr)
@@ -322,7 +322,7 @@ namespace BackEnd.Controllers
                     return NoContent();
                 }
             }
-            return NotFound();
+            return BadRequest("El usuario no existe");
         }
 
         [HttpGet("listarUsuariosAEsperaDeConfirmacion")]
