@@ -32,6 +32,27 @@ namespace BackEnd.Controllers
             return pencas == null ? NotFound() : Ok(pencas);
         }
 
+        [HttpGet("verInfoPenca/{id}")]
+        [ProducesResponseType(typeof(Equipo), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> getInfoPenca(int id)
+        {
+            var penca = await _context.Pencas.FindAsync(id);
+            if (penca == null) return BadRequest("No existe la penca");
+
+            DtPenca dtPenca = new DtPenca();
+            dtPenca.id = penca.id;
+            dtPenca.nombre = penca.nombre;
+            dtPenca.tipo_Deporte = penca.tipo_Deporte;
+            dtPenca.fecha_Creacion = penca.fecha_Creacion;
+            dtPenca.entrada = penca.entrada;
+            dtPenca.pozo = penca.pozo;
+            dtPenca.tipo_Liga = penca.tipo_Liga;
+            dtPenca.color = penca.color;
+            return Ok(dtPenca);
+        }
+
+
         [HttpPost("altaPencaCompartida/equipo")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -82,7 +82,7 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> misPencas(int id)
         {
-            List<DtPencaEmpresa> dtequipo = new List<DtPencaEmpresa>();
+            List<DtPencaEmpresa> dtPencasEmpresa = new List<DtPencaEmpresa>();
             Empresa empresa = new Empresa();
             var empresas = _context.Empresas.Include(e => e.pencas_empresa);
             foreach (var aux in empresas)
@@ -96,13 +96,15 @@ namespace BackEnd.Controllers
                             dtPE.id = aux2.id;
                             dtPE.nombre = aux2.nombre;
                             dtPE.tipoPlan = aux2.tipo_Plan;
-                            dtequipo.Add(dtPE);
+                            dtPE.entrada = aux2.entrada;
+                            dtPE.premioFinal = aux2.pozo;
+                            dtPE.tipoDeporte = aux2.tipo_Deporte;
+                            dtPE.tipo_Liga = aux2.tipo_Liga;
+                            dtPencasEmpresa.Add(dtPE);
 
                         }
-                        
-
                     }
-                    return Ok(dtequipo);
+                    return Ok(dtPencasEmpresa);
                 }
             }
             return BadRequest();

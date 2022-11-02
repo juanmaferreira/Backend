@@ -13,9 +13,9 @@ namespace BackEnd.Models.DataTypes
 
         public Tipo_Plan? tipoPlan { get; set; }
 
-        public float premioFinal { get; set; }
+        public float? premioFinal { get; set; }
 
-        public float entrada { get; set; }
+        public float? entrada { get; set; }
 
         public int idEmpresa { get; set; }
 

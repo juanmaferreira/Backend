@@ -14,7 +14,13 @@ namespace BackEnd.Models.DataTypes
 
         public Tipo_Deporte tipo_Deporte { get; set; }
 
+        public Tipo_Liga tipo_Liga { get; set; }
+
+        public Tipo_Plan? tipo_Plan { get; set; }
+
         public float? entrada { get; set; }
+
+        public float? pozo { get; set; }
 
         public string color { get; set; }
     }
