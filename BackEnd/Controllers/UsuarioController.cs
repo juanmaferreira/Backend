@@ -678,17 +678,17 @@ namespace BackEnd.Controllers
             var competencia = await _context.Competencias.FindAsync(id);
             if (competencia == null) return BadRequest("No existe la competencia");
 
-            var apuestas = _context.Apuestas.Include(a => a.competencia.apuestas);
+            var apuestas = _context.Apuestas.Include(a => a.competencia.apuestas).Include(a => a.usuario.apuestas).ToList();
             foreach (var apuesta in apuestas)
             {
-                if (apuesta.competencia.Id == idCompetencia)
+                if (apuesta.competencia.Id == idCompetencia && apuesta.usuario.id == usuario.id)
                 {
-                    var participante = await _context.Participantes.FindAsync(id);
+                    var participante = await _context.Participantes.FindAsync(apuesta.idGanador);
                     if (participante == null) return BadRequest("No existe el participante");
                     return Ok(participante.nombre);
                 }
             }
-            return NotFound("No se realizo una prediccion sobre esta competencia");
+            return Ok("");
         }
 
         [HttpGet("invitacionesPenca/{id}")]

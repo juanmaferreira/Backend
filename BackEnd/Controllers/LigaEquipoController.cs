@@ -65,7 +65,7 @@ namespace BackEnd.Controllers
 
             foreach (var aux in lEs)
             {
-                if (aux.activa && aux.topePartidos != 0 && aux.tipoDeporte == tipo)
+                if (aux.activa  && aux.tipoDeporte == tipo)
                 {
                     DtLigaEquipo dtLE = new DtLigaEquipo();
                     dtLE.nombreLiga = aux.nombreLiga;
