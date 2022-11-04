@@ -303,6 +303,7 @@ namespace BackEnd.Controllers
             Competencia competencia2 = new Competencia();
 
             List<Nombre> auxList = new List<Nombre>();
+            int posicion = 0;
 
             foreach (var aux in competencia)
             {
@@ -317,8 +318,9 @@ namespace BackEnd.Controllers
             List<Nombre> dtPart = new List<Nombre>();
             foreach (var dt in auxList)
             {
+                posicion++;
                 Nombre part = new Nombre();
-                part.Id = dt.Id;
+                part.Id = posicion;
                 part.nombre = dt.nombre;
                 dtPart.Add(part);
             }
