@@ -7,5 +7,7 @@ namespace BackEnd.Models.DataTypes
         public int idPuntuacion { get; set; }
         public string usuario { get; set; }
         public int puntaje { get; set; }
+
+        public int posicion { get; set; }
     }
 }

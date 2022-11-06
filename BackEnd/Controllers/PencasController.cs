@@ -650,15 +650,18 @@ namespace BackEnd.Controllers
         {
             var pencas = _context.Pencas.Include(pencas => pencas.participantes_puntos);
             List<DtPuntaje>posiciones = new List<DtPuntaje>();
+            int posicionU = 0;
             foreach (var aux in pencas)
             {
                 if (aux.id == id)
                 {
                     foreach (var puntuacion in aux.participantes_puntos)
                     {
+                        posicionU++;
                         var posicion = new DtPuntaje();
                         posicion.idPuntuacion = puntuacion.id;
                         posicion.puntaje = puntuacion.puntos;
+                        posicion.posicion = posicionU;
                         posiciones.Add(posicion);
                     }    
                 }
