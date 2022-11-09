@@ -73,7 +73,31 @@ namespace BackEnd.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = ligaI.Id }, ligaI);
         }
-        
+
+        [HttpGet("getLigasPorDisciplina")]
+        [ProducesResponseType(typeof(Liga_Equipo), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> getLigasPorDisciplina(Tipo_Area disciplina)
+        {
+            var lIs = _context.Liga_Individuales.ToList();
+            List<DtLiga_Individual> dtLigaI = new List<DtLiga_Individual>();
+
+            foreach (var aux in lIs)
+            {
+                if (aux.activa && aux.tipoArea == disciplina)
+                {
+                    DtLiga_Individual dtLI = new DtLiga_Individual();
+                    dtLI.Nombre = aux.Nombre;
+                    dtLI.topeCompetencias = aux.topeCompetencias;
+                    dtLI.tipoArea = aux.tipoArea;
+                    dtLI.Id = aux.Id;
+
+                    dtLigaI.Add(dtLI);
+                }
+            }
+            return dtLigaI == null ? NotFound() : Ok(dtLigaI);
+        }
+
         [HttpPut("agregarCompetencia")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
