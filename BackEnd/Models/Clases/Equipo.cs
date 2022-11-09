@@ -3,7 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.InteropServices;
 
 namespace BackEnd.Models.Clases{
-
+    public enum Division
+    {
+        Primera,
+        Seguna,
+        Tercera
+    }
     public class Equipo{
 
         public int id { get; set; }
@@ -15,6 +20,10 @@ namespace BackEnd.Models.Clases{
         public List<Partido> partidos { get; set; }
 
         public Tipo_Deporte deporte { get; set; }
+
+        public string pais { get; set; }
+
+        public Division division { get; set; }
 
         public void agregarHistorial(Tipo_Historial tipo)
         {

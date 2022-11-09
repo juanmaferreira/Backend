@@ -59,7 +59,7 @@ namespace BackEnd.Controllers
 
                         return aux == null ? NotFound() : Ok(dtUsuario);
                     }
-                    return BadRequest("Contraseña incorrecta");
+                    return BadRequest("Datos incorrectos");
                 }    
             }
             foreach (var aux in empresa)
@@ -76,7 +76,7 @@ namespace BackEnd.Controllers
                         dtEmpresa.tipo_rol = aux.tipoRol;
                         return aux == null ? NotFound() : Ok(dtEmpresa);
                     }
-                    return BadRequest("Contraseña incorrecta");
+                    return BadRequest("Datos incorrectos");
                 }
             }
             foreach (var aux in administrador)
@@ -93,7 +93,7 @@ namespace BackEnd.Controllers
                         dtAdmin.tipo_rol = aux.Tipo_Rol;
                         return aux == null ? NotFound() : Ok(dtAdmin);
                     }
-                    return BadRequest("Contraseña incorrecta");
+                    return BadRequest("Datos incorrectos");
                 }
             }
             foreach (var aux in superadmin)
@@ -111,10 +111,10 @@ namespace BackEnd.Controllers
 
                         return aux == null ? NotFound() : Ok(dtSAdmin);
                     }
-                    return BadRequest("Contraseña incorrecta");
+                    return BadRequest("Datos incorrectos");
                 }    
             }
-            return BadRequest("No existe el usuario en el sistema");
+            return BadRequest("Datos incorrectos");
         }
 
         [HttpPost("loginGoogle")]

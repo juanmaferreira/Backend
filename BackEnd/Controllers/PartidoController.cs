@@ -128,6 +128,9 @@ namespace BackEnd.Controllers
                         DtEquipo equipo = new DtEquipo();
                         equipo.Id = aux.id;
                         equipo.Name = aux.nombreEquipo;
+                        equipo.Deporte = aux.deporte;
+                        equipo.Division = aux.division;
+                        equipo.Pais = aux.pais;
                         equipoList.Add(equipo);
                     }
                     return Ok(equipoList);

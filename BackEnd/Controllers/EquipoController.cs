@@ -27,6 +27,9 @@ namespace BackEnd.Controllers
             var equipo = await _context.Equipos.FindAsync(id);
             dtequipo.Id = id;
             dtequipo.Name = equipo.nombreEquipo;
+            dtequipo.Deporte = equipo.deporte;
+            dtequipo.Division = equipo.division;
+            dtequipo.Pais = equipo.pais;
 
             return equipo == null ? NotFound() : Ok(dtequipo);
         }
@@ -38,11 +41,13 @@ namespace BackEnd.Controllers
             Equipo team = new Equipo();
             team.nombreEquipo = equipo.Name;
             team.deporte = equipo.Deporte;
+            team.pais = equipo.Pais;
+            team.division = equipo.Division;
 
             var equipos = _context.Equipos.ToList();
             foreach(var e in equipos)
             {
-                if (e.nombreEquipo == team.nombreEquipo) return BadRequest("Ya existe un equipo con ese nombre");
+                if (e.nombreEquipo == team.nombreEquipo && e.deporte == team.deporte) return BadRequest("Ya existe un equipo con ese nombre");
             }
             
             await _context.Equipos.AddAsync(team);
@@ -105,19 +110,44 @@ namespace BackEnd.Controllers
             return Ok(historial);
         }
 
-        [HttpGet("equiposPorDeporte")]
+        [HttpGet("equiposPorDeporteYPais")]
         [ProducesResponseType(typeof(Equipo), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetEquiposByDeporte(Tipo_Deporte Tipo_Deporte)
+        public async Task<IActionResult> GetEquiposByDeporte(Tipo_Deporte Tipo_Deporte, string pais)
         {
             var equipos = _context.Equipos.ToList();
             List<DtEquipo> equiposPorDeporte = new List<DtEquipo>();
             foreach (var equipo in equipos)
             {
-                if (equipo.deporte == Tipo_Deporte)
+                if (equipo.deporte == Tipo_Deporte && equipo.pais == pais)
                 {
                     DtEquipo dtEquipo = new DtEquipo();
                     dtEquipo.Id = equipo.id;
                     dtEquipo.Name = equipo.nombreEquipo;
+                    dtEquipo.Deporte = Tipo_Deporte;
+                    dtEquipo.Pais = equipo.pais;
+                    dtEquipo.Division = equipo.division;
+                    equiposPorDeporte.Add(dtEquipo);
+                }
+            }
+            return Ok(equiposPorDeporte);
+        }
+
+        [HttpGet("equiposPorFiltros")]
+        [ProducesResponseType(typeof(Equipo), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetEquiposByFiltros(Tipo_Deporte Tipo_Deporte, Division division, string pais)
+        {
+            var equipos = _context.Equipos.ToList();
+            List<DtEquipo> equiposPorDeporte = new List<DtEquipo>();
+            foreach (var equipo in equipos)
+            {
+                if (equipo.deporte == Tipo_Deporte && equipo.division == division && equipo.pais == pais)
+                {
+                    DtEquipo dtEquipo = new DtEquipo();
+                    dtEquipo.Id = equipo.id;
+                    dtEquipo.Name = equipo.nombreEquipo;
+                    dtEquipo.Deporte = Tipo_Deporte;
+                    dtEquipo.Pais = equipo.pais;
+                    dtEquipo.Division = equipo.division;
                     equiposPorDeporte.Add(dtEquipo);
                 }
             }
