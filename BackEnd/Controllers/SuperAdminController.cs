@@ -76,6 +76,50 @@ namespace BackEnd.Controllers
 
             return Ok(dtSuperAdmin);
         }
+        [HttpGet("PencasCompartidasGet")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> listarPencasCompartidas(Tipo_Deporte deporte)
+        {
+
+            
+            var pencas = _context.Pencas.Include(a => a.liga_Individual).Include(a => a.liga_Equipo).ToList();
+            List<DtPencasCompartida> pencasComp = new List<DtPencasCompartida>();
+      
+                    foreach (var aux in pencas)
+                    {
+                        if (aux.estado && aux.tipo_Deporte == deporte)
+                        {
+                            DtPencasCompartida pencasaCompartidas = new DtPencasCompartida();
+                            pencasaCompartidas.id = aux.id;
+                            pencasaCompartidas.nombre = aux.nombre;
+                            pencasaCompartidas.tipoDeporte = aux.tipo_Deporte;
+                            pencasaCompartidas.entrada = aux.entrada;
+                            pencasaCompartidas.pozo = aux.pozo;
+                            pencasaCompartidas.Tipo_Liga = aux.tipo_Liga;
+                            pencasaCompartidas.estado = aux.estado;
+
+                           if (aux.tipo_Liga == Tipo_Liga.Individual)
+                           {
+                            pencasaCompartidas.idLiga = aux.liga_Individual.Id;
+                            pencasaCompartidas.estadoLiga = aux.liga_Individual.activa;
+                           }
+                           if (aux.tipo_Liga == Tipo_Liga.Equipo)
+                           {
+                            pencasaCompartidas.idLiga = aux.liga_Equipo.id;
+                            pencasaCompartidas.estadoLiga = aux.liga_Equipo.activa;
+                           }
+                            
+
+
+                            pencasComp.Add(pencasaCompartidas);
+                        }
+
+                    }
+                    return Ok(pencasComp);
+            return NotFound();
+        }
 
         [HttpPost("meterDatos")]
         [ProducesResponseType(StatusCodes.Status201Created)]
