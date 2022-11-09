@@ -106,6 +106,7 @@ namespace BackEnd.Controllers
             _context.Entry(visitante).State = EntityState.Modified;
             _context.Entry(local).State = EntityState.Modified;
             await _context.SaveChangesAsync();
+            dtpartido.id = partido.id;
 
             return CreatedAtAction(nameof(GetById), new { id = dtpartido.id }, dtpartido);
         }

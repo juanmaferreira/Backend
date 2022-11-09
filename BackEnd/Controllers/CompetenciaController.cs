@@ -78,8 +78,9 @@ namespace BackEnd.Controllers
 
             await _context.Competencias.AddAsync(competencia);
             await _context.SaveChangesAsync();
+            dtcompetencia.Id = competencia.Id;
 
-            return CreatedAtAction(nameof(GetById), new { id = competencia.Id }, competencia);
+            return CreatedAtAction(nameof(GetById), new { id = dtcompetencia.Id }, dtcompetencia);
         }
 
         [HttpPut("agregarParticipante/{id}")]
