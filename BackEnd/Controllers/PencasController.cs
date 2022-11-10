@@ -139,6 +139,7 @@ namespace BackEnd.Controllers
 
                 if (empresa.billetera < 1000) return BadRequest("No tienes saldo suficiente para realizar esta penca");
                 empresa.billetera -= 1000;
+                penca.topeUsuarios = -1;
             }
             if (dtPE.tipoPlan == Tipo_Plan.Basico)
             {
@@ -197,7 +198,8 @@ namespace BackEnd.Controllers
             {
 
                 if (empresa.billetera < 1000) return BadRequest("No tienes saldo suficiente para realizar esta penca");
-                empresa.billetera -= 1000;
+                 empresa.billetera -= 1000
+                    penca.topeUsuarios = -1;
             }
             if (dtPE.tipoPlan == Tipo_Plan.Basico)
             {

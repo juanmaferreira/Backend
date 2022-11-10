@@ -414,8 +414,8 @@ namespace BackEnd.Controllers
                             existePenca = true;
                             p=penca;
                             if (empresa.pencas_empresa.Contains(penca)){
-                                if (penca.topeUsuarios == 0) return BadRequest("Has superado el maximo de participantes en la Penca");
-                                penca.topeUsuarios--;
+                                if (penca.tipo_Plan == Tipo_Plan.Basico && penca.topeUsuarios == 0) return BadRequest("Has superado el maximo de participantes en la Penca");
+                                if (penca.tipo_Plan == Tipo_Plan.Basico) penca.topeUsuarios--;
                                 _context.Entry(penca).State = EntityState.Modified;
                                 break;
                             }
