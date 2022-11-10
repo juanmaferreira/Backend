@@ -126,6 +126,26 @@ namespace BackEnd.Controllers
             var usuario = await _context.Usuario.FindAsync(idUsuario);
             if (usuario == null) return BadRequest("El usuario no existe");
 
+            var todoChats = _context.Chats.Include(e => e.empresa).Include(u => u.usuario).ToList();
+            Chat chat = new Chat();
+            foreach(var c in todoChats)
+            {
+                if(c.usuario.id == usuario.id && c.empresa.id == empresa.id)
+                {
+                    chat = c;
+                    Mensaje me = new Mensaje();
+                    me.mensaje = "■" + mensaje;//alt + 254
+                    await _context.Mensajes.AddAsync(me);
+
+                    chat.mensajes.Add(me);
+                    _context.Entry(chat).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+
+                    return NoContent();
+                }
+            }
+
+
             if (empresa.chats == null)
             {
                 empresa.chats = new List<Chat>();
@@ -136,7 +156,7 @@ namespace BackEnd.Controllers
                 usuario.chats = new List<Chat>();
             }
 
-            Chat chat = new Chat();
+            
             chat.empresa = empresa;
             chat.usuario = usuario;
 
@@ -242,6 +262,9 @@ namespace BackEnd.Controllers
             bool empresa = false;
             bool p = false;
             string nombreEmpresa = null;
+
+            
+
             foreach(var aux in pencas)
             {
                 if(aux.id == dtInvitacion.idPenca)
@@ -374,12 +397,14 @@ namespace BackEnd.Controllers
             var pencas = _context.Pencas.Include(p => p.liga_Individual).ToList();
             var empresas = _context.Empresas.Include(e => e.pencas_empresa).ToList();
             var puntuaciones = _context.Puntuaciones.Include(p => p.usuario).Include(p => p.penca).ToList();
-
+            Empresa emp = new Empresa();
+            Penca p = new Penca();
             var existeEmpresa = false;
             foreach (var empresa in empresas)
             {
                 if (empresa.id == idEmpresa)
                 {
+                    emp = empresa;
                     existeEmpresa = true;
                     var existePenca = false;
                     foreach (var penca in pencas)
@@ -387,7 +412,13 @@ namespace BackEnd.Controllers
                         if (penca.id == idPenca)
                         {
                             existePenca = true;
-                            if (empresa.pencas_empresa.Contains(penca)) break;
+                            p=penca;
+                            if (empresa.pencas_empresa.Contains(penca)){
+                                if (penca.topeUsuarios == 0) return BadRequest("Has superado el maximo de participantes en la Penca");
+                                penca.topeUsuarios--;
+                                _context.Entry(penca).State = EntityState.Modified;
+                                break;
+                            }
                             else return BadRequest("la penca no pertenece a esta empresa");
                         }
                     }
@@ -404,8 +435,53 @@ namespace BackEnd.Controllers
                     usuarioPertenece = true;
                     if (puntuacion.estado == estado_Penca.Pendiente)
                     {
-                        if (aceptar) puntuacion.estado = estado_Penca.Aceptado;
-                        else puntuacion.estado = estado_Penca.Rechazado;
+                        if (aceptar){
+                            puntuacion.estado = estado_Penca.Aceptado;
+
+                            if (puntuacion.usuario.chats == null)
+                            {
+                                puntuacion.usuario.chats = new List<Chat>();
+                            }
+                            if (emp.chats == null)
+                            {
+                                emp.chats = new List<Chat>();
+                            }
+
+                            Chat chat = new Chat();
+                            puntuacion.usuario.chats.Add(chat);
+                            emp.chats.Add(chat);
+                            await _context.Chats.AddAsync(chat);
+
+                            string texto = "Saludos " + puntuacion.usuario.nombre + ", le avisamos que la penca " + p.nombre + " ha aceptado su solicitud de entrar a jugar.";
+                            MailMessage mensaje = new MailMessage("penqueapp@gmail.com", puntuacion.usuario.email, "[PenqueApp] Bienvenido a la Penca de la Empresa", texto);
+                            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com");
+                            smtpClient.EnableSsl = true;
+                            smtpClient.UseDefaultCredentials = false;
+                            smtpClient.Host = "smtp.gmail.com";
+                            smtpClient.Port = 587;
+                            smtpClient.Credentials = new System.Net.NetworkCredential("penqueapp@gmail.com", "qwknavxpudbjjtfr");
+
+                            smtpClient.Send(mensaje);
+                            smtpClient.Dispose();
+                        }
+                        
+                        else {
+                            puntuacion.estado = estado_Penca.Rechazado;
+                            puntuacion.usuario.billetera += puntuacion.penca.entrada;
+
+                            string texto = "Saludos " + puntuacion.usuario.nombre + ", le avisamos que la penca " + p.nombre + " rechazo su solicitud de ingreso.";
+                            MailMessage mensaje = new MailMessage("penqueapp@gmail.com", puntuacion.usuario.email, "[PenqueApp] Boletín informativo", texto);
+                            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com");
+                            smtpClient.EnableSsl = true;
+                            smtpClient.UseDefaultCredentials = false;
+                            smtpClient.Host = "smtp.gmail.com";
+                            smtpClient.Port = 587;
+                            smtpClient.Credentials = new System.Net.NetworkCredential("penqueapp@gmail.com", "qwknavxpudbjjtfr");
+
+                            smtpClient.Send(mensaje);
+                            smtpClient.Dispose();
+                        }
+                        
                         _context.Puntuaciones.Add(puntuacion).State = EntityState.Modified;
                         await _context.SaveChangesAsync();
                         break;

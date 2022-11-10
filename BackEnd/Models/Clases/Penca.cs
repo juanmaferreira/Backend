@@ -65,6 +65,8 @@ namespace BackEnd.Models.Clases
 
         public string color { get; set; }
 
+        public int topeUsuarios { get; set; }
+
 
         //Constructores
         public Penca() {

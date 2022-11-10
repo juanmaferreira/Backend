@@ -546,6 +546,25 @@ namespace BackEnd.Controllers
             var empresa = await _context.Empresas.FindAsync(idEmpresa);
             if (empresa == null) return BadRequest("La empresa no existe");
 
+            var todoChats = _context.Chats.Include(e => e.empresa).Include(u => u.usuario).ToList();
+            Chat chat = new Chat();
+            foreach (var c in todoChats)
+            {
+                if (c.usuario.id == usuario.id && c.empresa.id == empresa.id)
+                {
+                    chat = c;
+                    Mensaje me = new Mensaje();
+                    me.mensaje = "☻" + mensaje;//alt + 254
+                    await _context.Mensajes.AddAsync(me);
+
+                    chat.mensajes.Add(me);
+                    _context.Entry(chat).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+
+                    return NoContent();
+                }
+            }
+
             if (usuario.chats == null)
             {
                 usuario.chats = new List<Chat>();
@@ -555,7 +574,6 @@ namespace BackEnd.Controllers
                 empresa.chats = new List<Chat>();
             }
 
-            Chat chat = new Chat();
             chat.usuario = usuario;
             chat.empresa = empresa;
 
