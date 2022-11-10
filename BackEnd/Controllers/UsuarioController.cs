@@ -424,6 +424,7 @@ namespace BackEnd.Controllers
                     {
                         DtPenca dtPenca = new DtPenca();
                         dtPenca.id = pencas.penca.id;
+                        dtPenca.color = pencas.penca.color;
                         dtPenca.nombre = pencas.penca.nombre;
                         dtPenca.tipo_Deporte = pencas.penca.tipo_Deporte;
                         dtPenca.fecha_Creacion = pencas.penca.fecha_Creacion;
