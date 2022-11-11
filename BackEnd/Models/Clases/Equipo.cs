@@ -6,7 +6,7 @@ namespace BackEnd.Models.Clases{
     public enum Division
     {
         Primera,
-        Seguna,
+        Segunda,
         Tercera
     }
     public class Equipo{

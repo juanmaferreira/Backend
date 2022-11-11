@@ -26,9 +26,17 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetById(int id)
         {
-            var ligaE = await _context.Liga_Equipos.FindAsync(id);
 
-            return ligaE == null ? NotFound() : Ok(ligaE);
+            var Liga = await _context.Liga_Equipos.FindAsync(id);
+            if (Liga == null) return BadRequest("No existe la Liga");
+
+            DtLigaEquipo dtLiga = new DtLigaEquipo();
+            dtLiga.id = Liga.id;
+            dtLiga.nombreLiga = Liga.nombreLiga;
+            dtLiga.tope = Liga.topePartidos;
+            dtLiga.tipoDeporte = Liga.tipoDeporte;
+
+            return Liga == null ? NotFound() : Ok(dtLiga);
         }
 
         [HttpGet("getLigasSinUsar")]
