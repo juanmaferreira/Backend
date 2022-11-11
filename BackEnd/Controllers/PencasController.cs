@@ -188,7 +188,7 @@ namespace BackEnd.Controllers
             penca.color = "";
             penca.tipo_Liga = Tipo_Liga.Individual;
             penca.liga_Equipo = null;
-            penca.tipo_Liga = dtPE.tipo_Liga;
+            penca.tipo_Liga = Tipo_Liga.Individual;
 
             var LigaI = await _context.Liga_Individuales.FindAsync(dtPE.idLiga);
             var empresa = await _context.Empresas.FindAsync(dtPE.idEmpresa);
@@ -198,7 +198,7 @@ namespace BackEnd.Controllers
             {
 
                 if (empresa.billetera < 1000) return BadRequest("No tienes saldo suficiente para realizar esta penca");
-                 empresa.billetera -= 1000
+                empresa.billetera -= 1000;
                     penca.topeUsuarios = -1;
             }
             if (dtPE.tipoPlan == Tipo_Plan.Basico)
