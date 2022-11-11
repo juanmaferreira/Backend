@@ -65,7 +65,7 @@ namespace BackEnd.Controllers
             penca.tipo_Penca = Tipo_Penca.Compartida;
             penca.entrada = dtPC.entrada;
             penca.pozo = 0;
-            penca.fecha_Creacion = new DateTime();
+            penca.fecha_Creacion = DateTime.Now;
             penca.estado = true;
             penca.color = "";
             penca.tipo_Liga = Tipo_Liga.Equipo;
@@ -94,7 +94,7 @@ namespace BackEnd.Controllers
             penca.tipo_Penca = Tipo_Penca.Compartida;
             penca.entrada = dtPC.entrada;
             penca.pozo = 0;
-            penca.fecha_Creacion = new DateTime();
+            penca.fecha_Creacion = DateTime.Now;
             penca.estado = true;
             penca.color = "";
             penca.tipo_Liga = Tipo_Liga.Individual;
@@ -124,7 +124,7 @@ namespace BackEnd.Controllers
             penca.tipo_Penca = Tipo_Penca.Empresa;
             penca.entrada = dtPE.entrada;
             penca.pozo = dtPE.premioFinal;
-            penca.fecha_Creacion = new DateTime();
+            penca.fecha_Creacion = DateTime.Now;
             penca.estado = true;
             penca.color = "";
             penca.tipo_Liga = Tipo_Liga.Equipo;
@@ -183,7 +183,7 @@ namespace BackEnd.Controllers
             penca.tipo_Penca = Tipo_Penca.Empresa;
             penca.entrada = dtPE.entrada;
             penca.pozo = dtPE.premioFinal;
-            penca.fecha_Creacion = new DateTime();
+            penca.fecha_Creacion = DateTime.Now;
             penca.estado = true;
             penca.color = "";
             penca.tipo_Liga = Tipo_Liga.Individual;
