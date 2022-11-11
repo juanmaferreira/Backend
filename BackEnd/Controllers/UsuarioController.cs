@@ -428,6 +428,7 @@ namespace BackEnd.Controllers
                         dtPenca.nombre = pencas.penca.nombre;
                         dtPenca.tipo_Deporte = pencas.penca.tipo_Deporte;
                         dtPenca.fecha_Creacion = pencas.penca.fecha_Creacion;
+                        dtPenca.tipoPenca = pencas.penca.tipo_Penca;
 
                         dtPencas.Add(dtPenca);
                     }

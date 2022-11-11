@@ -23,5 +23,7 @@ namespace BackEnd.Models.DataTypes
         public float? pozo { get; set; }
 
         public string color { get; set; }
+
+        public Tipo_Penca tipoPenca { get; set; }
     }
 }
