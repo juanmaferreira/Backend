@@ -854,5 +854,21 @@ namespace BackEnd.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
+        [HttpGet("miBilletera/{id}")]
+        [ProducesResponseType(typeof(Usuario), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> getBilletera(int id)
+        {
+            var usuario = await _context.Usuario.FindAsync(id);
+            if (usuario == null) return BadRequest("No existe el usuario");
+
+            DtUsuario dtUsuario = new DtUsuario();
+            dtUsuario.billetera = usuario.billetera;
+            dtUsuario.Id = usuario.id;
+
+            return usuario == null ? NotFound() : Ok(dtUsuario);
+        }
     }
+    
 }

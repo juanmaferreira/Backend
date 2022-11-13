@@ -495,5 +495,20 @@ namespace BackEnd.Controllers
             if (usuarioPertenece) return NoContent();
             else return BadRequest("el usuario no pertenece a la penca");
         }
+
+        [HttpGet("miBilletera/{id}")]
+        [ProducesResponseType(typeof(Usuario), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> getBilletera(int id)
+        {
+            var empresa = await _context.Empresas.FindAsync(id);
+            if (empresa == null) return BadRequest("No existe el usuario");
+
+            DtEmpresa dtEmpresa = new DtEmpresa();
+            dtEmpresa.Billetera = empresa.billetera;
+            dtEmpresa.Id = empresa.id;
+
+            return empresa == null ? NotFound() : Ok(dtEmpresa);
+        }
     }
 }
