@@ -519,7 +519,7 @@ namespace BackEnd.Controllers
             var usuario = await _context.Usuario.FindAsync(dtMensajeForo.IdUsuario);
             if (usuario == null) return BadRequest("No existe el Usuario");
             Mensaje mensaje = new Mensaje();
-            mensaje.mensaje = ">" + usuario.nombre + ": " + dtMensajeForo.Comentario + ".";
+            mensaje.mensaje = usuario.nombre + ": " + dtMensajeForo.Comentario + ".";
             if (penca.foro == null)
             {
                 List<Mensaje> foro = new List<Mensaje>();
