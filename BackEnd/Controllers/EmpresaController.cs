@@ -397,6 +397,7 @@ namespace BackEnd.Controllers
             var pencas = _context.Pencas.Include(p => p.liga_Individual).ToList();
             var empresas = _context.Empresas.Include(e => e.pencas_empresa).ToList();
             var puntuaciones = _context.Puntuaciones.Include(p => p.usuario).Include(p => p.penca).ToList();
+            var chats = _context.Chats.Include(p => p.usuario).Include(e => e.empresa).ToList();
             Empresa emp = new Empresa();
             Penca p = new Penca();
             var existeEmpresa = false;
@@ -446,11 +447,23 @@ namespace BackEnd.Controllers
                             {
                                 emp.chats = new List<Chat>();
                             }
+                            bool tieneChat = false;
+                            foreach(var c in chats)
+                            {
+                                if(c.usuario.id == puntuacion.usuario.id && c.empresa.id == emp.id)
+                                {
+                                    tieneChat = true;
+                                    break;
+                                }
+                            }
 
-                            Chat chat = new Chat();
-                            puntuacion.usuario.chats.Add(chat);
-                            emp.chats.Add(chat);
-                            await _context.Chats.AddAsync(chat);
+                            if (!tieneChat) {
+                                Chat chat = new Chat();
+                                puntuacion.usuario.chats.Add(chat);
+                                emp.chats.Add(chat);
+                                await _context.Chats.AddAsync(chat);
+                            }
+                            
 
                             string texto = "Saludos " + puntuacion.usuario.nombre + ", le avisamos que la penca " + p.nombre + " ha aceptado su solicitud de entrar a jugar.";
                             MailMessage mensaje = new MailMessage("penqueapp@gmail.com", puntuacion.usuario.email, "[PenqueApp] Bienvenido a la Penca de la Empresa", texto);
