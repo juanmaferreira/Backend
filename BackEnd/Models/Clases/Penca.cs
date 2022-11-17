@@ -67,6 +67,8 @@ namespace BackEnd.Models.Clases
 
         public int topeUsuarios { get; set; }
 
+        public bool tieneAdmin { get; set; }
+
 
         //Constructores
         public Penca() {
