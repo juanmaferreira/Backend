@@ -55,9 +55,17 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetById(int id)
         {
-            var competencia = await _context.Competencias.FindAsync(id);
+            var Competencia = await _context.Competencias.FindAsync(id);
+            if (Competencia == null) return BadRequest("No existe la competencia");
 
-            return competencia == null ? NotFound() : Ok(competencia);
+            DtCompetencia dtCompetencia = new DtCompetencia();
+            dtCompetencia.Id = Competencia.Id;
+            dtCompetencia.nombre = Competencia.nombre;
+            dtCompetencia.topeParticipantes = Competencia.topeParticipantes;
+            dtCompetencia.fecha_competencia = Competencia.fecha_competencia;
+            dtCompetencia.estado = Competencia.activa;
+
+            return Competencia == null ? NotFound() : Ok(dtCompetencia);
         }
 
         [HttpPost("altaCompetencia")]

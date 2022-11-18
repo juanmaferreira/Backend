@@ -38,6 +38,7 @@ namespace BackEnd.Controllers
             part.Id = participante.Id;
             part.nombre = participante.nombre;
             part.Area = participante.Area;
+            part.pais = participante.pais;
             DbSet<Participante> p = _context.Participantes;
             foreach (var aux in p)
             {
@@ -65,10 +66,34 @@ namespace BackEnd.Controllers
                     dtParticipante.Area = aux.Area;
                     dtParticipante.Id = aux.Id;
                     dtParticipante.nombre = aux.nombre;
+                    dtParticipante.pais = aux.pais;
                     dtP.Add(dtParticipante);
                 }
             }
             
+            return Ok(dtP);
+        }
+
+        [HttpGet("mostrarParticipantesPorPaisArea/{area}")]
+        [ProducesResponseType(typeof(Participante), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetParticipanteByPaisArea(string pais, Tipo_Area area)
+        {
+            var participante = _context.Participantes;
+            List<DtParticipante> dtP = new List<DtParticipante>();
+            foreach (var aux in participante)
+            {
+                if (aux.Area.Equals(area) && aux.pais == pais)
+                {
+                    DtParticipante dtParticipante = new DtParticipante();
+                    dtParticipante.Area = aux.Area;
+                    dtParticipante.Id = aux.Id;
+                    dtParticipante.nombre = aux.nombre;
+                    dtParticipante.pais = aux.pais;
+                    dtP.Add(dtParticipante);
+                }
+            }
+
             return Ok(dtP);
         }
     }
