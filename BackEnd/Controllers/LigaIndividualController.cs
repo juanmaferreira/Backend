@@ -25,10 +25,17 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetById(int id)
         {
-            var ligaI = await _context.Liga_Individuales.FindAsync(id);
-            Console.Out.WriteLine(ligaI.competencias);
+            var Liga = await _context.Liga_Individuales.FindAsync(id);
+            if (Liga == null) return BadRequest("No existe la Liga");
 
-            return ligaI == null ? NotFound() : Ok(ligaI);
+            DtLiga_Individual dtLiga = new DtLiga_Individual();
+            dtLiga.Id = Liga.Id;
+            dtLiga.Nombre = Liga.Nombre;
+            dtLiga.tipoArea = Liga.tipoArea;
+            dtLiga.topeCompetencias = Liga.topeCompetencias;
+           
+
+            return Liga == null ? NotFound() : Ok(dtLiga);
         }
 
         [HttpGet("getLigasSinUsar")]
