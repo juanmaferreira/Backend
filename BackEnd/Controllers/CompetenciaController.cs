@@ -98,7 +98,7 @@ namespace BackEnd.Controllers
         {
             var competencia = await _context.Competencias.FindAsync(id);
             //Si la competencia no existe
-            if (competencia == null) return BadRequest();
+            if (competencia == null) return BadRequest("No existe la competencia");
 
             var compAux = _context.Competencias.Include(e => e.participantes);
             Competencia competencia2 = new Competencia();
@@ -116,7 +116,7 @@ namespace BackEnd.Controllers
             }
 
             var part = await _context.Participantes.FindAsync(idParticipante);
-            if (part == null) return BadRequest();
+            if (part == null) return BadRequest("No existe el participante");
 
             //Comp.ForEachAsync(Console.WriteLine);
             if (auxList.Count == 0)
@@ -124,9 +124,14 @@ namespace BackEnd.Controllers
                 competencia.participantes = new List<Participante>();
             }
 
+            if (competencia.participantes.Contains(part))
+            {
+                return BadRequest("El participante ya se encuentra inscripto en esta competencia");
+            }
+
             if (auxList.Count < competencia.topeParticipantes) 
             {
-
+                
                 competencia.participantes.Add(part);
 
                 _context.Entry(competencia).State = EntityState.Modified;
@@ -138,7 +143,7 @@ namespace BackEnd.Controllers
 
                 return NoContent();
             }
-            return BadRequest();
+            return BadRequest("Se ha alcanzado el máximo de participantes");
         }
 
         [HttpGet("mostrarParticipantes/{id}")]
