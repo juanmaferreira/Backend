@@ -174,19 +174,19 @@ namespace BackEnd.Controllers
             return dtAdmins == null ? NotFound() : Ok(dtAdmins);      
         }
 
-        [HttpGet("getPencasCompartidasSinAdmin")]
+        [HttpGet("getPencasCompartidasSinAdminEquipo")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> getPencasCompartidasSinAdmin(Tipo_Deporte tipo)
+        public async Task<IActionResult> getPencasCompartidasSinAdminEquipo(int idLiga)
         {
 
-            var pencas = _context.Pencas.Include(a => a.liga_Individual).Include(a => a.liga_Equipo).ToList();
+            var pencas = _context.Pencas.Include(a => a.liga_Equipo).ToList();
             List<DtPencasCompartida> pencasComp = new List<DtPencasCompartida>();
 
                     foreach (var aux in pencas)
                     {
-                        if (aux.estado && !aux.tieneAdmin && aux.tipo_Penca == Tipo_Penca.Compartida && aux.tipo_Deporte == tipo)
+                        if (aux.estado && !aux.tieneAdmin && aux.tipo_Penca == Tipo_Penca.Compartida && aux.liga_Equipo.id == idLiga)
                         {
                             DtPencasCompartida pencasaCompartidas = new DtPencasCompartida();
                             pencasaCompartidas.id = aux.id;
@@ -197,6 +197,31 @@ namespace BackEnd.Controllers
 
                     }
                     return Ok(pencasComp);
+        }
+
+        [HttpGet("getPencasCompartidasSinAdminIndividual")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> getPencasCompartidasSinAdminIndividual(int idLiga)
+        {
+
+            var pencas = _context.Pencas.Include(a => a.liga_Individual).ToList();
+            List<DtPencasCompartida> pencasComp = new List<DtPencasCompartida>();
+
+            foreach (var aux in pencas)
+            {
+                if (aux.estado && !aux.tieneAdmin && aux.tipo_Penca == Tipo_Penca.Compartida && aux.liga_Individual.Id == idLiga)
+                {
+                    DtPencasCompartida pencasaCompartidas = new DtPencasCompartida();
+                    pencasaCompartidas.id = aux.id;
+                    pencasaCompartidas.nombre = aux.nombre;
+
+                    pencasComp.Add(pencasaCompartidas);
+                }
+
+            }
+            return Ok(pencasComp);
         }
     }
 }
