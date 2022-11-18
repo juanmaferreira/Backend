@@ -20,5 +20,7 @@ namespace BackEnd.Models.DataTypes
         public bool estado { get; set; }
         public bool estadoLiga { get; set; }
 
+        public bool tieneAdmin { get; set; }
+
     }
 }

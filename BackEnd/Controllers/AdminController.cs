@@ -84,7 +84,7 @@ namespace BackEnd.Controllers
 
             var penca = await _context.Pencas.FindAsync(idPenca);
             if (penca == null) return BadRequest("No existe la penca");
-
+            penca.tieneAdmin = true;
             var admin = await _context.Administradores.FindAsync(idADmin);
             if (admin == null) return BadRequest("No existe el administrador");
 
