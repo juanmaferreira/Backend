@@ -152,6 +152,52 @@ namespace BackEnd.Controllers
             }
             return NotFound();
         }
+
+        [HttpGet("getAdmins")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> getAdmins() { 
+
+            List<DtAdmin> dtAdmins = new List<DtAdmin> ();
+            var admins = _context.Administradores;
+
+            foreach (var aux in admins) { 
+
+                DtAdmin dtAdmin = new DtAdmin();
+                dtAdmin.Id = aux.Id;
+                dtAdmin.Name = aux.nombre;
+                dtAdmin.Email = aux.email;
+                dtAdmins.Add(dtAdmin);
+            }
+
+            return dtAdmins == null ? NotFound() : Ok(dtAdmins);      
+        }
+
+        [HttpGet("getPencasCompartidasSinAdmin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> getPencasCompartidasSinAdmin(Tipo_Deporte tipo)
+        {
+
+            var pencas = _context.Pencas.Include(a => a.liga_Individual).Include(a => a.liga_Equipo).ToList();
+            List<DtPencasCompartida> pencasComp = new List<DtPencasCompartida>();
+
+                    foreach (var aux in pencas)
+                    {
+                        if (aux.estado && !aux.tieneAdmin && aux.tipo_Penca == Tipo_Penca.Compartida && aux.tipo_Deporte == tipo)
+                        {
+                            DtPencasCompartida pencasaCompartidas = new DtPencasCompartida();
+                            pencasaCompartidas.id = aux.id;
+                            pencasaCompartidas.nombre = aux.nombre;
+
+                            pencasComp.Add(pencasaCompartidas);
+                        }
+
+                    }
+                    return Ok(pencasComp);
+        }
     }
 }
 

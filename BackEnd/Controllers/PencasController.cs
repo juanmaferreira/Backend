@@ -70,6 +70,7 @@ namespace BackEnd.Controllers
             penca.color = "";
             penca.tipo_Liga = Tipo_Liga.Equipo;
             penca.liga_Individual = null;
+            penca.tieneAdmin = false;
             var LigaE = await _context.Liga_Equipos.FindAsync(dtPC.idLiga);
             if (LigaE == null) return BadRequest("No existe la liga");
             
@@ -99,6 +100,7 @@ namespace BackEnd.Controllers
             penca.color = "";
             penca.tipo_Liga = Tipo_Liga.Individual;
             penca.liga_Equipo = null;
+            penca.tieneAdmin = false;
             var LigaI = await _context.Liga_Individuales.FindAsync(dtPC.idLiga);
             if (LigaI == null) return BadRequest("No existe la liga");
 
