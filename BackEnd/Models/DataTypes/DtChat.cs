@@ -10,5 +10,8 @@ namespace BackEnd.Models.DataTypes
 
         public string empresa { get; set; }
 
+        public int idusuario { get; set; }
+        public int idempresa { get; set; }
+
     }
 }

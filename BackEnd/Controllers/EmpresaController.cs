@@ -208,6 +208,8 @@ namespace BackEnd.Controllers
                         chat.Id = auxC.Id;
                         chat.usuario = auxU.usuario.nombre;
                         chat.empresa = auxC.empresa.nombre;
+                        chat.idusuario = auxU.usuario.id;
+                        chat.idempresa = auxC.empresa.id;
                         chat2.Add(chat);
                     }
                 }
