@@ -147,7 +147,7 @@ namespace BackEnd.Controllers
         public async Task<IActionResult> getPartidos(int id)
         {
             var ligaE = _context.Liga_Equipos.Include(e => e.partidos).ToList();
-            var partidos = _context.Partidos.Include(e => e.visitante_local).ToList();
+            var partidos = _context.Partidos.ToList();
 
             List<DtPartido> partidosList = new List<DtPartido>();
             
@@ -166,8 +166,14 @@ namespace BackEnd.Controllers
                         foreach(var e in partidos) {
                             if(aux.id == e.id)
                             {
-                                partido.visitante = e.visitante_local.ElementAt(0).nombreEquipo;
-                                partido.local = e.visitante_local.ElementAt(1).nombreEquipo;
+                                var local = await _context.Equipos.FindAsync(aux.IdLocal);
+                                if (local == null) return BadRequest("No existe el equipo");
+                                partido.local = local.nombreEquipo;
+
+                                var visitante = await _context.Equipos.FindAsync(aux.IdVisitante);
+                                if (visitante == null) return BadRequest("No existe el equipo");
+                                partido.visitante = visitante.nombreEquipo;
+                                
                                 break;
                             }
                         }

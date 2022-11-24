@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Routing;
 using System.Net.Mail;
+using System.Runtime.Intrinsics.X86;
 
 namespace BackEnd.Controllers
 {
@@ -27,19 +28,24 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> getPartidosSinUsar(Tipo_Deporte tipo)
         {
-            var partidos = _context.Partidos.Include(e => e.visitante_local).ToList();
+            var partidos = _context.Partidos.ToList();
             List<DtPartido> dtpartidos = new List<DtPartido>();
             
             foreach (var aux in partidos)
             {
                 if (!aux.enUso && aux.resultado == Tipo_Resultado.Indefinido && aux.deporte == tipo)
                 {
+                    var local = await _context.Equipos.FindAsync(aux.IdLocal);
+                    if (local == null) return BadRequest("No existe el equipo");
+                    var visitante = await _context.Equipos.FindAsync(aux.IdVisitante);
+                    if (visitante == null) return BadRequest("No existe el equipo");
+
                     DtPartido dtpartido = new DtPartido();
                     dtpartido.fecha = aux.fechaPartido;
                     dtpartido.resultado = aux.resultado;
                     dtpartido.id = aux.id;
-                    dtpartido.visitante = aux.visitante_local.ElementAt(0).nombreEquipo;
-                    dtpartido.local = aux.visitante_local.ElementAt(1).nombreEquipo;
+                    dtpartido.local = local.nombreEquipo;
+                    dtpartido.visitante = visitante.nombreEquipo;
                     dtpartidos.Add(dtpartido);
                 }
             }
@@ -51,19 +57,23 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetById(int id)
         {
-            var partidos = _context.Partidos.Include(e => e.visitante_local).ToList();
+            var partidos = _context.Partidos.ToList();
             DtPartido dtpartido = new DtPartido();
             foreach (var aux in partidos)
             {
                 if(aux.id == id)
                 {
-                    
+                    var local = await _context.Equipos.FindAsync(aux.IdLocal);
+                    if (local == null) return BadRequest("No existe el equipo");
+                    var visitante = await _context.Equipos.FindAsync(aux.IdVisitante);
+                    if (visitante == null) return BadRequest("No existe el equipo");
+
                     dtpartido.fecha = aux.fechaPartido;
                     dtpartido.resultado = aux.resultado;
-                    dtpartido.local = aux.visitante_local.ElementAt(1).nombreEquipo;
-                    dtpartido.visitante = aux.visitante_local.ElementAt(0).nombreEquipo;
-                    dtpartido.Idvisitante = aux.visitante_local.ElementAt(0).id;
-                    dtpartido.Idlocal = aux.visitante_local.ElementAt(1).id;
+                    dtpartido.local = local.nombreEquipo;
+                    dtpartido.Idlocal = local.id;
+                    dtpartido.visitante = visitante.nombreEquipo;
+                    dtpartido.Idvisitante = visitante.id;
                     dtpartido.id = aux.id;
                 }
             }
@@ -79,15 +89,21 @@ namespace BackEnd.Controllers
         public async Task<IActionResult> altaEquipo(DtPartido dtpartido)
         {
             Partido partido = new Partido();
+            
+
             Equipo? local = await _context.Equipos.FindAsync(dtpartido.Idlocal);
             Equipo? visitante = await _context.Equipos.FindAsync(dtpartido.Idvisitante);
 
             if (local == null || visitante == null) return BadRequest("Uno de los equipos ingresados es NULL");
-            if (local.id == visitante.id) return BadRequest("No puedes elejir que compita contra si mismo");
+            if (local.id == visitante.id) return BadRequest("Debes elegir equipos distintos");
 
+
+            Console.WriteLine("Local: " + local.id);
+            Console.WriteLine("Visitante: " + visitante.id);
             partido.deporte = dtpartido.deporte;
             partido.fechaPartido = dtpartido.fecha;
-            partido.visitante_local = new List<Equipo> {visitante, local};
+            partido.IdLocal = local.id;
+            partido.IdVisitante = visitante.id;
             partido.enUso = false;
             partido.resultado = Tipo_Resultado.Indefinido;
 
@@ -115,24 +131,34 @@ namespace BackEnd.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetEquipoById(int id)
+        public async Task<IActionResult> GetEquiposById(int id)
         {
-            var partido =  _context.Partidos.Include(p => p.visitante_local);
+            var partido =  _context.Partidos;
             List<DtEquipo> equipoList = new List<DtEquipo>();
             foreach(var item in partido)
             {
                 if(item.id == id)
                 {
-                    foreach (var aux in item.visitante_local)
-                    {
-                        DtEquipo equipo = new DtEquipo();
-                        equipo.Id = aux.id;
-                        equipo.Name = aux.nombreEquipo;
-                        equipo.Deporte = aux.deporte;
-                        equipo.Division = aux.division;
-                        equipo.Pais = aux.pais;
-                        equipoList.Add(equipo);
-                    }
+                    var local = await _context.Equipos.FindAsync(item.IdLocal);
+                    if (local == null) return BadRequest("No existe el equipo");
+                    var visitante = await _context.Equipos.FindAsync(item.IdVisitante);
+                    if (visitante == null) return BadRequest("No existe el equipo");
+
+                    DtEquipo equipo = new DtEquipo();
+                    equipo.Id = local.id;
+                    equipo.Name = local.nombreEquipo;
+                    equipo.Deporte = local.deporte;
+                    equipo.Division = local.division;
+                    equipo.Pais = local.pais;
+                    equipoList.Add(equipo);
+
+                    equipo.Id = visitante.id;
+                    equipo.Name = visitante.nombreEquipo;
+                    equipo.Deporte = visitante.deporte;
+                    equipo.Division = visitante.division;
+                    equipo.Pais = visitante.pais;
+                    equipoList.Add(equipo);
+
                     return Ok(equipoList);
                 }
             }
@@ -149,12 +175,17 @@ namespace BackEnd.Controllers
             var partido = await _context.Partidos.FindAsync(id);
             if (partido == null) return BadRequest("No existe el partido");
 
+            var local = await _context.Equipos.FindAsync(partido.IdLocal);
+            if (local == null) return BadRequest("No existe el equipo");
+            var visitante = await _context.Equipos.FindAsync(partido.IdVisitante);
+            if (visitante == null) return BadRequest("No existe el equipo");
+
             var random = new Random();
             partido.resultado = (Tipo_Resultado)random.Next(Enum.GetNames(typeof(Tipo_Resultado)).Length -1);
 
             _context.Entry(partido).State = EntityState.Modified;
 
-            var partido2 = _context.Partidos.Include(p => p.visitante_local);
+            var partido2 = _context.Partidos;
 
             Partido play = new Partido();
             foreach (var item in partido2)
@@ -166,18 +197,18 @@ namespace BackEnd.Controllers
                 }
             }
             if(play.resultado == Tipo_Resultado.Empate) {
-                play.visitante_local.ElementAt(0).agregarHistorial(Tipo_Historial.Empato);
-                play.visitante_local.ElementAt(1).agregarHistorial(Tipo_Historial.Empato);
+                local.agregarHistorial(Tipo_Historial.Empato);
+                visitante.agregarHistorial(Tipo_Historial.Empato);
             }
             if(play.resultado == Tipo_Resultado.Local)
             {
-                play.visitante_local.ElementAt(0).agregarHistorial(Tipo_Historial.Perdio);
-                play.visitante_local.ElementAt(1).agregarHistorial(Tipo_Historial.Gano);
+                local.agregarHistorial(Tipo_Historial.Perdio);
+                visitante.agregarHistorial(Tipo_Historial.Gano);
             }
             if (play.resultado == Tipo_Resultado.Visitante)
             {
-                play.visitante_local.ElementAt(0).agregarHistorial(Tipo_Historial.Gano);
-                play.visitante_local.ElementAt(1).agregarHistorial(Tipo_Historial.Perdio);
+                local.agregarHistorial(Tipo_Historial.Gano);
+                visitante.agregarHistorial(Tipo_Historial.Perdio);
             }
 
             _context.Entry(play).State = EntityState.Modified;

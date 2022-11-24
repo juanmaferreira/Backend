@@ -49,6 +49,7 @@ namespace BackEnd.Controllers
             dtPenca.pozo = penca.pozo;
             dtPenca.tipo_Liga = penca.tipo_Liga;
             dtPenca.color = penca.color;
+            dtPenca.tieneAdmin = penca.tieneAdmin;
             return Ok(dtPenca);
         }
 
