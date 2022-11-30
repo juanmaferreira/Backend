@@ -525,5 +525,68 @@ namespace BackEnd.Controllers
 
             return empresa == null ? NotFound() : Ok(dtEmpresa);
         }
+
+        [HttpGet("reportes/{id}")]
+        [ProducesResponseType(typeof(Usuario), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> getReportes(int id)
+        {
+            var empresa = await _context.Empresas.Include(e => e.pencas_empresa).FirstOrDefaultAsync(e => e.id == id);
+            if (empresa == null) return BadRequest("No existe el usuario");
+
+            DtReporteEmpresa dtReporteEmpresa = new DtReporteEmpresa();
+            var listPencas = new List<DtPenca>();
+            dtReporteEmpresa.numeroDePencas = empresa.pencas_empresa.Count();
+            dtReporteEmpresa.premiosRepartidos = 0;
+
+            foreach (var aux in empresa.pencas_empresa)
+            {
+                var penca = await _context.Pencas.Include(p => p.participantes_puntos).Include(p => p.foro).FirstOrDefaultAsync(p => p.id ==  aux.id);
+                if (penca == null) return BadRequest("No existe la penca");
+
+                if (penca.estado) 
+                {
+                    dtReporteEmpresa.pencasActivas++;
+
+                    DtPenca dtPenca = new DtPenca();
+                    dtPenca.nombre = penca.nombre;
+                    dtPenca.tipo_Plan = penca.tipo_Plan;
+                    dtPenca.tipo_Deporte = penca.tipo_Deporte;
+                    dtPenca.tipo_Liga = penca.tipo_Liga;
+                    dtPenca.fecha_Creacion = penca.fecha_Creacion;
+                    dtPenca.pozo = penca.pozo;
+                    dtPenca.entrada = penca.entrada;
+
+                    listPencas.Add(dtPenca);
+                }
+                else
+                {
+                    dtReporteEmpresa.pencasFinalizadas++;
+                    dtReporteEmpresa.premiosRepartidos += penca.pozo;
+                }
+
+                if (penca.tipo_Plan == Tipo_Plan.Premium)
+                {
+                    dtReporteEmpresa.pencasPremium++;
+                }
+
+                if (penca.tipo_Liga == Tipo_Liga.Individual)
+                {
+                    dtReporteEmpresa.pencasIndividuales++;
+                }
+                else {
+                    dtReporteEmpresa.pencasDeEquipo++;
+                }
+
+                dtReporteEmpresa.mensajesEnForos += penca.foro.Count();
+
+                dtReporteEmpresa.numeroDeUsuarios += penca.participantes_puntos.Count();
+
+            }
+
+            dtReporteEmpresa.pencas = listPencas.ToArray();
+
+            return empresa == null ? NotFound() : Ok(dtReporteEmpresa);
+        }
     }
 }
