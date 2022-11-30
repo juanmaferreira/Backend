@@ -9,6 +9,7 @@
 
         public Usuario usuario { get; set; }
 
-         public int idPuntuacionUsuario { get; set; }
+        public int idPuntuacionUsuario { get; set; }
+        public int idPenca { get; set; }
     }
 }

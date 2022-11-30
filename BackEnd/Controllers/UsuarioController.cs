@@ -343,6 +343,7 @@ namespace BackEnd.Controllers
             prediccion.partido = partido;
             prediccion.tipo_Resultado = dtP.tipo;
             prediccion.usuario = usuario;
+            prediccion.idPenca = dtP.idPenca;
 
             Usuario user = new Usuario();
             Penca penca2 = new Penca();
@@ -455,6 +456,7 @@ namespace BackEnd.Controllers
             apuesta.idGanador = dtA.idParticipante;
             apuesta.usuario = usuario;
             apuesta.competencia = competencia;
+            apuesta.idPenca = dtA.idCompetencia;
 
             Usuario user = new Usuario();
             Penca penca2 = new Penca();
@@ -671,17 +673,17 @@ namespace BackEnd.Controllers
         [ProducesResponseType(typeof(Prediccion), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> verPrediccionPartido(int id, int idPartido)
+        public async Task<IActionResult> verPrediccionPartido(int id, int idPartido,int idPenca)
         {
             var usuario = await _context.Usuario.FindAsync(id);
             if (usuario == null) return BadRequest("No existe el usuario");
             var partido = await _context.Partidos.FindAsync(idPartido);
             if (partido == null) return BadRequest("No existe el partido");
 
-            var predicciones = _context.Predicciones.Include(p => p.partido.predicciones);
+            var predicciones = _context.Predicciones.Include(p => p.partido.predicciones).Include(p => p.usuario);
             foreach (var prediccion in predicciones)
             {
-                if (prediccion.partido.id == partido.id)
+                if (prediccion.partido.id == partido.id && prediccion.usuario.id == id && prediccion.idPenca == idPenca)
                 {
                     return Ok(prediccion.tipo_Resultado);
                 }
@@ -693,7 +695,7 @@ namespace BackEnd.Controllers
         [ProducesResponseType(typeof(Prediccion), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> verPrediccionCompetencia(int id, int idCompetencia)
+        public async Task<IActionResult> verPrediccionCompetencia(int id, int idCompetencia, int idPenca)
         {
             var usuario = await _context.Usuario.FindAsync(id);
             if (usuario == null) return BadRequest("No existe el usuario");
@@ -703,7 +705,7 @@ namespace BackEnd.Controllers
             var apuestas = _context.Apuestas.Include(a => a.competencia.apuestas).Include(a => a.usuario.apuestas).ToList();
             foreach (var apuesta in apuestas)
             {
-                if (apuesta.competencia.Id == idCompetencia && apuesta.usuario.id == usuario.id)
+                if (apuesta.competencia.Id == idCompetencia && apuesta.usuario.id == usuario.id && apuesta.idPenca == idPenca)
                 {
                     var participante = await _context.Participantes.FindAsync(apuesta.idGanador);
                     if (participante == null) return BadRequest("No existe el participante");

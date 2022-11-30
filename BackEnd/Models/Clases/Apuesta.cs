@@ -9,7 +9,8 @@
         public int idGanador { get; set; }
 
         public int idPuntuacionUsuario { get; set; }
+        public int idPenca { get; set; }
 
-        
+
     }
 }
