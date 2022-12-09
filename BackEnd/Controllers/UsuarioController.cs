@@ -456,7 +456,7 @@ namespace BackEnd.Controllers
             apuesta.idGanador = dtA.idParticipante;
             apuesta.usuario = usuario;
             apuesta.competencia = competencia;
-            apuesta.idPenca = dtA.idCompetencia;
+            apuesta.idPenca = dtA.idPenca;
 
             Usuario user = new Usuario();
             Penca penca2 = new Penca();

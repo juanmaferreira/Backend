@@ -22,5 +22,7 @@ namespace BackEnd.Models.DataTypes
 
         public bool tieneAdmin { get; set; }
 
+        public Tipo_Penca tipoPenca { get; set; }
+
     }
 }

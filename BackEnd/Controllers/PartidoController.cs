@@ -75,6 +75,7 @@ namespace BackEnd.Controllers
                     dtpartido.visitante = visitante.nombreEquipo;
                     dtpartido.Idvisitante = visitante.id;
                     dtpartido.id = aux.id;
+                    dtpartido.deporte = aux.deporte;
                 }
             }
 
@@ -181,7 +182,14 @@ namespace BackEnd.Controllers
             if (visitante == null) return BadRequest("No existe el equipo");
 
             var random = new Random();
-            partido.resultado = (Tipo_Resultado)random.Next(Enum.GetNames(typeof(Tipo_Resultado)).Length -1);
+            if(partido.deporte == Tipo_Deporte.Futbol) {
+                partido.resultado = (Tipo_Resultado)random.Next(Enum.GetNames(typeof(Tipo_Resultado)).Length - 1);
+            }
+            else
+            {
+               partido.resultado = (Tipo_Resultado)random.Next(Enum.GetNames(typeof(Tipo_Resultado)).Length - 2);
+            }
+            
 
             _context.Entry(partido).State = EntityState.Modified;
 
